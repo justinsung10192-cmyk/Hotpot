@@ -1,0 +1,1807 @@
+<!DOCTYPE html>
+<html lang="zh-TW" class="h-full select-none">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>抽象神聖火鍋大師：終極煮鍋儀式版 | Surreal Hot Pot Alchemy</title>
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Font Awesome 6 Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@600;900&family=Noto+Sans+TC:wght@300;400;700;900&display=swap" rel="stylesheet">
+
+  <!-- Three.js Engine & OrbitControls -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+
+  <style>
+    * {
+      font-family: 'Noto Sans TC', -apple-system, BlinkMacSystemFont, sans-serif;
+      touch-action: manipulation;
+    }
+
+    .font-serif-tc {
+      font-family: 'Noto Serif TC', serif;
+    }
+
+    body {
+      background-color: #030712;
+      color: #f3f4f6;
+      overflow: hidden;
+      margin: 0;
+      padding: 0;
+      width: 100vw;
+      height: 100vh;
+    }
+
+    /* Glassmorphism styling */
+    .glass-panel {
+      background: rgba(15, 23, 42, 0.82);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+    }
+
+    .glass-card {
+      background: linear-gradient(135deg, rgba(30, 41, 59, 0.88), rgba(15, 23, 42, 0.96));
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .glass-card:hover {
+      transform: translateY(-6px) scale(1.02);
+      border-color: rgba(251, 146, 60, 0.7);
+      box-shadow: 0 16px 32px -8px rgba(234, 88, 12, 0.4), 0 0 20px rgba(251, 146, 60, 0.25);
+    }
+
+    /* Tier Glow Colors */
+    .tier-sss-plus { color: #f43f5e; text-shadow: 0 0 20px #f43f5e, 0 0 40px #fb7185, 0 0 60px #e11d48; }
+    .tier-sss { color: #fb923c; text-shadow: 0 0 18px #fb923c, 0 0 36px #ea580c; }
+    .tier-ss { color: #a855f7; text-shadow: 0 0 18px #a855f7, 0 0 35px #7e22ce; }
+    .tier-s { color: #fbbf24; text-shadow: 0 0 15px #fbbf24, 0 0 30px #d97706; }
+    .tier-a { color: #38bdf8; text-shadow: 0 0 12px #38bdf8; }
+    .tier-b { color: #4ade80; text-shadow: 0 0 10px #4ade80; }
+    .tier-c { color: #94a3b8; }
+    .tier-f { color: #ef4444; text-shadow: 0 0 15px #ef4444; }
+
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-track { background: rgba(0,0,0,0.2); }
+    ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 4px; }
+
+    #canvas-container {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      z-index: 0;
+    }
+
+    /* White Flash Overlay for Ritual */
+    #flash-overlay {
+      position: fixed;
+      inset: 0;
+      background-color: #ffffff;
+      opacity: 0;
+      pointer-events: none;
+      z-index: 60;
+      transition: opacity 0.5s ease-out;
+    }
+
+    @keyframes spin-slow {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    .animate-spin-slow {
+      animation: spin-slow 12s linear infinite;
+    }
+  </style>
+</head>
+<body class="relative h-full w-full overflow-hidden">
+
+  <!-- 3D WebGL Canvas Target -->
+  <div id="canvas-container"></div>
+
+  <!-- Screen Flash for Ceremony Completion -->
+  <div id="flash-overlay"></div>
+
+  <!-- UI OVERLAY CONTAINER -->
+  <div id="ui-overlay" class="relative z-10 flex flex-col justify-between h-full w-full pointer-events-none p-3 md:p-6">
+    
+    <!-- TOP HEADER BAR -->
+    <header class="flex items-center justify-between w-full max-w-6xl mx-auto pointer-events-auto">
+      <!-- Title & Branding -->
+      <div class="glass-panel px-3.5 py-2 rounded-2xl flex items-center space-x-3 shadow-2xl">
+        <div class="w-9 h-9 md:w-10 md:h-10 rounded-xl bg-gradient-to-tr from-amber-500 via-orange-600 to-rose-600 flex items-center justify-center shadow-lg shadow-orange-500/30">
+          <i class="fa-solid fa-fire-burner text-white text-base md:text-lg animate-bounce"></i>
+        </div>
+        <div>
+          <h1 class="text-sm md:text-base font-black bg-gradient-to-r from-amber-200 via-orange-300 to-rose-400 bg-clip-text text-transparent font-serif-tc">
+            抽象神聖火鍋大師
+          </h1>
+          <p class="text-[9px] md:text-[10px] text-amber-400/90 font-mono tracking-wider">RITUAL EDITION • 100+ INGREDIENTS</p>
+        </div>
+      </div>
+
+      <!-- Action Controls Header -->
+      <div class="flex items-center space-x-2 md:space-x-3">
+        <!-- Interactive Stir Button -->
+        <button id="btn-stir" class="glass-panel px-3 py-2 rounded-2xl hover:bg-slate-800 transition text-amber-400 font-bold text-xs flex items-center space-x-1.5 shadow-lg border border-amber-500/30 active:scale-95">
+          <i class="fa-solid fa-arrows-spin text-sm animate-spin-slow"></i>
+          <span class="hidden sm:inline">攪拌湯鍋</span>
+        </button>
+
+        <!-- Audio Toggle Button -->
+        <button id="btn-audio" class="glass-panel p-2.5 rounded-2xl hover:bg-slate-800 transition text-amber-400 flex items-center justify-center shadow-lg">
+          <i id="icon-audio" class="fa-solid fa-volume-high text-sm"></i>
+        </button>
+
+        <!-- Round Indicator Pill -->
+        <div id="round-indicator" class="glass-panel px-3.5 py-2 rounded-2xl flex items-center space-x-2">
+          <span class="text-[10px] md:text-xs text-slate-400 uppercase font-bold tracking-wider">回合</span>
+          <div class="flex space-x-1.5" id="round-dots">
+            <!-- Dynamic Dots -->
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- LEFT DRAWER: Current Pot Ingredients -->
+    <aside id="drawer-pot" class="absolute left-3 md:left-6 top-20 w-52 md:w-60 glass-panel rounded-2xl p-3 pointer-events-auto hidden md:block transition-all duration-500 shadow-2xl">
+      <div class="flex items-center justify-between mb-2 pb-2 border-b border-slate-700/50">
+        <div class="flex items-center space-x-2">
+          <i class="fa-solid fa-bowl-food text-orange-400 text-xs"></i>
+          <h2 class="text-xs font-bold uppercase tracking-wider text-slate-200">鍋內聖物 (<span id="item-count">0</span>/5)</h2>
+        </div>
+      </div>
+      <div id="pot-contents-list" class="space-y-1.5 max-h-48 overflow-y-auto pr-1">
+        <div class="text-[11px] text-slate-500 italic py-2 text-center">湯鍋尚空，等待注入靈魂...</div>
+      </div>
+    </aside>
+
+    <!-- START GAME MODAL -->
+    <div id="modal-start" class="pointer-events-auto absolute inset-0 flex items-center justify-center bg-slate-950/90 backdrop-blur-md z-30 p-4">
+      <div class="glass-panel max-w-lg w-full rounded-3xl p-6 md:p-8 text-center space-y-6 shadow-2xl border border-amber-500/40">
+        <div class="w-20 h-20 mx-auto rounded-3xl bg-gradient-to-tr from-amber-500 via-orange-600 to-rose-600 flex items-center justify-center shadow-2xl shadow-orange-500/40 border border-amber-300/30">
+          <i class="fa-solid fa-fire-burner text-4xl text-white"></i>
+        </div>
+        <div>
+          <h2 class="text-2xl md:text-3xl font-black text-white font-serif-tc mb-2">抽象神聖火鍋大師</h2>
+          <p class="text-xs text-amber-400 font-mono tracking-widest uppercase mb-3">終極煮鍋儀式版 (Ritual Edition)</p>
+          <p class="text-xs md:text-sm text-slate-300 leading-relaxed">
+            超越物理定律與美食極限的煉金大典！<br>
+            資料庫收錄 <span class="text-amber-400 font-bold">100+ 種絕世食材與概念</span>（台味靈魂、宇宙黑洞、考前焦慮到四維超正方體）。<br>
+            每回合提供 <span class="text-amber-400 font-bold">5 選 1</span> 機制，歷經 5 回合後將開啟 <span class="text-rose-400 font-bold">10 秒強烈神聖煮鍋儀式</span>！
+          </p>
+        </div>
+
+        <button id="btn-start-game" class="w-full py-4 rounded-2xl bg-gradient-to-r from-amber-500 via-orange-500 to-rose-600 hover:from-amber-400 hover:to-rose-500 text-white font-black text-base md:text-lg shadow-xl shadow-orange-500/30 hover:shadow-orange-500/50 transition-all transform active:scale-95 flex items-center justify-center space-x-2">
+          <span>開啟量子火鍋煉金儀式</span>
+          <i class="fa-solid fa-wand-magic-sparkles"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- MAIN GAMEPLAY AREA: 5 CHOICE CARDS -->
+    <main id="gameplay-area" class="w-full max-w-6xl mx-auto pointer-events-auto transition-all duration-500 mb-2 md:mb-4 hidden">
+      <div class="text-center mb-2.5">
+        <span id="round-title-badge" class="inline-block px-3.5 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-amber-500/20 text-amber-300 border border-amber-500/40 mb-1">
+          第 1 回合：湯底奠基
+        </span>
+        <h3 id="round-prompt" class="text-sm md:text-base font-bold text-white drop-shadow">請從 5 種量子高湯中選擇注入鍋中的靈魂...</h3>
+      </div>
+
+      <!-- 5 Choice Cards Grid (Responsive 5-col / 3-col) -->
+      <div id="choices-container" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-2.5 md:gap-3">
+        <!-- Dynamic Cards -->
+      </div>
+    </main>
+
+    <!-- SACRED RITUAL CEREMONY HUD OVERLAY -->
+    <div id="ritual-overlay" class="pointer-events-none absolute inset-0 flex flex-col items-center justify-between z-30 p-6 hidden">
+      <!-- Top Title -->
+      <div class="glass-panel px-6 py-2.5 rounded-full border border-amber-400/50 shadow-2xl animate-pulse">
+        <span class="text-xs md:text-sm font-black tracking-widest text-amber-300 font-serif-tc uppercase">
+          ✨ 【神聖火鍋煉金儀式進行中】 ✨
+        </span>
+      </div>
+
+      <!-- Center Dynamic Ceremony Phase Banner -->
+      <div class="text-center space-y-2 max-w-xl mx-auto my-auto">
+        <div class="inline-block p-3 rounded-3xl bg-slate-950/80 backdrop-blur-xl border border-amber-500/50 shadow-2xl">
+          <p id="ritual-phase-subtitle" class="text-xs font-mono text-amber-400 tracking-widest uppercase mb-1">STAGE 01 / 04</p>
+          <h2 id="ritual-phase-title" class="text-xl md:text-3xl font-black text-white font-serif-tc animate-bounce">
+            第一階段：封印靈魂湯底
+          </h2>
+        </div>
+        <p id="ritual-phase-desc" class="text-xs text-slate-300 drop-shadow">結界防護罩降臨，準備凝聚宇宙級美味波函數...</p>
+      </div>
+
+      <!-- Bottom Progress Bar -->
+      <div class="w-full max-w-md bg-slate-900/80 rounded-full h-3 border border-amber-500/30 overflow-hidden shadow-xl mb-4">
+        <div id="ritual-progress-bar" class="bg-gradient-to-r from-amber-500 via-rose-500 to-purple-600 h-full w-0 transition-all duration-300"></div>
+      </div>
+    </div>
+
+    <!-- FINAL EVALUATION RESULT MODAL -->
+    <div id="modal-result" class="pointer-events-auto absolute inset-0 flex items-center justify-center bg-slate-950/90 backdrop-blur-xl z-40 p-4 hidden overflow-y-auto">
+      <div class="glass-panel max-w-2xl w-full rounded-3xl p-5 md:p-7 text-center space-y-4 shadow-2xl border border-amber-500/40 my-auto">
+        
+        <!-- Header Badge & Tier Rating -->
+        <div class="flex items-center justify-between">
+          <div class="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-slate-800 border border-slate-700 text-amber-300 text-xs font-bold uppercase tracking-widest">
+            <i class="fa-solid fa-trophy text-amber-400"></i>
+            <span>神聖煉金評級成果</span>
+          </div>
+          <!-- TIER RANK BADGE -->
+          <div id="tier-badge" class="text-4xl md:text-5xl font-black font-mono tracking-tighter tier-sss-plus">
+            SSS+
+          </div>
+        </div>
+
+        <!-- Generated Dish Title & Subtitle -->
+        <div>
+          <h2 id="result-title" class="text-xl md:text-2xl font-black bg-gradient-to-r from-amber-200 via-orange-300 to-rose-400 bg-clip-text text-transparent font-serif-tc leading-tight py-1">
+            【開悟者之十一維量子火鍋】
+          </h2>
+          <p id="result-subtitle" class="text-xs text-amber-300 font-mono mt-0.5">—— 喝一口直視宇宙起源，舌頭進入疊加態三秒。</p>
+        </div>
+
+        <!-- Abstract Metrics Multi-Bar -->
+        <div class="grid grid-cols-2 sm:grid-cols-3 gap-2 text-left bg-slate-900/80 p-3 rounded-2xl border border-slate-800/80 text-[11px]">
+          <div>
+            <div class="flex justify-between font-bold text-slate-300 mb-1">
+              <span>🍲 旨味 (Umami)</span>
+              <span id="score-umami-val" class="text-amber-400">95</span>
+            </div>
+            <div class="w-full bg-slate-800 h-2 rounded-full overflow-hidden">
+              <div id="score-umami-bar" class="bg-amber-400 h-full transition-all duration-1000" style="width: 0%"></div>
+            </div>
+          </div>
+
+          <div>
+            <div class="flex justify-between font-bold text-slate-300 mb-1">
+              <span>🌀 抽象指數</span>
+              <span id="score-abs-val" class="text-purple-400">98</span>
+            </div>
+            <div class="w-full bg-slate-800 h-2 rounded-full overflow-hidden">
+              <div id="score-abs-bar" class="bg-purple-500 h-full transition-all duration-1000" style="width: 0%"></div>
+            </div>
+          </div>
+
+          <div>
+            <div class="flex justify-between font-bold text-slate-300 mb-1">
+              <span>💥 靈魂值 (Soul)</span>
+              <span id="score-soul-val" class="text-rose-400">92</span>
+            </div>
+            <div class="w-full bg-slate-800 h-2 rounded-full overflow-hidden">
+              <div id="score-soul-bar" class="bg-rose-500 h-full transition-all duration-1000" style="width: 0%"></div>
+            </div>
+          </div>
+
+          <div>
+            <div class="flex justify-between font-bold text-slate-300 mb-1">
+              <span>🔥 辣度與熱能</span>
+              <span id="score-heat-val" class="text-orange-400">85</span>
+            </div>
+            <div class="w-full bg-slate-800 h-2 rounded-full overflow-hidden">
+              <div id="score-heat-bar" class="bg-orange-500 h-full transition-all duration-1000" style="width: 0%"></div>
+            </div>
+          </div>
+
+          <div>
+            <div class="flex justify-between font-bold text-slate-300 mb-1">
+              <span>🌌 混沌失控度</span>
+              <span id="score-chaos-val" class="text-cyan-400">88</span>
+            </div>
+            <div class="w-full bg-slate-800 h-2 rounded-full overflow-hidden">
+              <div id="score-chaos-bar" class="bg-cyan-500 h-full transition-all duration-1000" style="width: 0%"></div>
+            </div>
+          </div>
+
+          <div class="col-span-2 sm:col-span-1 flex items-center justify-center bg-slate-800/50 rounded-xl p-1">
+            <button id="btn-stir-final" class="w-full h-full text-amber-300 hover:text-white font-bold text-xs flex items-center justify-center space-x-1">
+              <i class="fa-solid fa-arrows-spin animate-spin-slow"></i>
+              <span>再攪拌欣賞 3D 湯鍋</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Dramatic Review Narrative -->
+        <div class="bg-slate-900/90 p-3 rounded-2xl border border-slate-800 text-left">
+          <h4 class="text-xs font-bold text-amber-400 uppercase tracking-wider mb-1 flex items-center space-x-1">
+            <i class="fa-solid fa-scroll text-amber-400"></i>
+            <span>宇宙美食評論家判詞：</span>
+          </h4>
+          <p id="result-review" class="text-xs md:text-sm text-slate-300 leading-relaxed italic">
+            湯底注入了無條件的熱情，肉丸在沸騰中進入疊加態...
+          </p>
+        </div>
+
+        <!-- Action Buttons: Share, Snapshot Card, Restart -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5 pt-1">
+          <button id="btn-share-text" class="py-3 px-3 rounded-2xl bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white font-bold text-xs md:text-sm shadow-lg transition active:scale-95 flex items-center justify-center space-x-1.5">
+            <i class="fa-solid fa-share-nodes"></i>
+            <span>複製 IG/LINE 戰績</span>
+          </button>
+
+          <button id="btn-snapshot" class="py-3 px-3 rounded-2xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-xs md:text-sm shadow-lg transition active:scale-95 flex items-center justify-center space-x-1.5">
+            <i class="fa-solid fa-camera"></i>
+            <span>下載 3D 戰績卡 (PNG)</span>
+          </button>
+
+          <button id="btn-restart" class="py-3 px-3 rounded-2xl bg-gradient-to-r from-amber-500 via-orange-500 to-rose-600 hover:from-amber-400 hover:to-rose-500 text-white font-bold text-xs md:text-sm shadow-lg transition active:scale-95 flex items-center justify-center space-x-1.5">
+            <i class="fa-solid fa-rotate-right"></i>
+            <span>再煮一鍋 (Re-boil)</span>
+          </button>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- TOAST NOTIFICATION OVERLAY -->
+    <div id="toast-container" class="fixed bottom-6 left-1/2 transform -translate-x-1/2 z-50 pointer-events-none"></div>
+
+  </div>
+
+  <!-- JAVASCRIPT GAME LOGIC -->
+  <script>
+    /* =========================================================================
+       1. WEB AUDIO SYNTHESIZER
+       ========================================================================= */
+    class AudioSynth {
+      constructor() {
+        this.ctx = null;
+        this.isMuted = false;
+        this.boilGain = null;
+        this.boilFilter = null;
+      }
+
+      init() {
+        if (this.ctx) return;
+        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+        this.ctx = new AudioCtx();
+        this.setupBoilingLoop();
+      }
+
+      toggleMute() {
+        this.isMuted = !this.isMuted;
+        if (this.boilGain) {
+          this.boilGain.gain.setValueAtTime(this.isMuted ? 0 : 0.05, this.ctx.currentTime);
+        }
+        return this.isMuted;
+      }
+
+      setupBoilingLoop() {
+        if (!this.ctx) return;
+        const bufferSize = this.ctx.sampleRate * 2;
+        const noiseBuffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
+        const output = noiseBuffer.getChannelData(0);
+        let lastOut = 0.0;
+        for (let i = 0; i < bufferSize; i++) {
+          const white = Math.random() * 2 - 1;
+          output[i] = (lastOut + (0.02 * white)) / 1.02;
+          lastOut = output[i];
+          output[i] *= 3.5;
+        }
+
+        const whiteNoise = this.ctx.createBufferSource();
+        whiteNoise.buffer = noiseBuffer;
+        whiteNoise.loop = true;
+
+        this.boilFilter = this.ctx.createBiquadFilter();
+        this.boilFilter.type = 'lowpass';
+        this.boilFilter.frequency.value = 280;
+
+        this.boilGain = this.ctx.createGain();
+        this.boilGain.gain.value = 0.05;
+
+        whiteNoise.connect(this.boilFilter);
+        this.boilFilter.connect(this.boilGain);
+        this.boilGain.connect(this.ctx.destination);
+        whiteNoise.start();
+
+        const lfo = this.ctx.createOscillator();
+        lfo.frequency.value = 2.5;
+        const lfoGain = this.ctx.createGain();
+        lfoGain.gain.value = 80;
+        lfo.connect(lfoGain);
+        lfoGain.connect(this.boilFilter.frequency);
+        lfo.start();
+      }
+
+      playSelect() {
+        if (!this.ctx || this.isMuted) return;
+        const now = this.ctx.currentTime;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(440, now);
+        osc.frequency.exponentialRampToValueAtTime(880, now + 0.12);
+        gain.gain.setValueAtTime(0.15, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.12);
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start(now);
+        osc.stop(now + 0.12);
+      }
+
+      playSplash() {
+        if (!this.ctx || this.isMuted) return;
+        const now = this.ctx.currentTime;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(320, now);
+        osc.frequency.exponentialRampToValueAtTime(60, now + 0.25);
+        gain.gain.setValueAtTime(0.3, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.25);
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start(now);
+        osc.stop(now + 0.25);
+      }
+
+      playStirSound() {
+        if (!this.ctx || this.isMuted) return;
+        const now = this.ctx.currentTime;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(200, now);
+        osc.frequency.linearRampToValueAtTime(350, now + 0.2);
+        osc.frequency.linearRampToValueAtTime(180, now + 0.5);
+        gain.gain.setValueAtTime(0.2, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.5);
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start(now);
+        osc.stop(now + 0.5);
+      }
+
+      playRitualDrone() {
+        if (!this.ctx || this.isMuted) return;
+        const now = this.ctx.currentTime;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(55, now);
+        osc.frequency.exponentialRampToValueAtTime(110, now + 8);
+        gain.gain.setValueAtTime(0.01, now);
+        gain.gain.linearRampToValueAtTime(0.18, now + 4);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 9.5);
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start(now);
+        osc.stop(now + 9.5);
+      }
+
+      playDivineGong() {
+        if (!this.ctx || this.isMuted) return;
+        const notes = [130.81, 196.00, 261.63, 392.00, 523.25, 659.25, 1046.50];
+        notes.forEach((freq, i) => {
+          const now = this.ctx.currentTime + i * 0.06;
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          osc.type = 'sine';
+          osc.frequency.value = freq;
+          gain.gain.setValueAtTime(0.2, now);
+          gain.gain.exponentialRampToValueAtTime(0.0001, now + 2.5);
+          osc.connect(gain);
+          gain.connect(this.ctx.destination);
+          osc.start(now);
+          osc.stop(now + 2.5);
+        });
+      }
+    }
+
+    const sound = new AudioSynth();
+
+    /* =========================================================================
+       2. 100+ MASTER INGREDIENTS DATABASE
+       ========================================================================= */
+    const MASTER_INGREDIENTS = [
+      // ----------------- CAT 1: BROTHS (Round 1) -----------------
+      { id: 'b1', name: '麻辣紅油高湯', desc: '沸騰地獄烈火，具備強烈辛辣波動。', icon: 'fa-fire', color: 0xcc1100, fogColor: 0x220500, meshType: 'broth', stats: { umami: 78, abs: 30, soul: 80, heat: 98, chaos: 40 }, category: 'broth' },
+      { id: 'b2', name: '宇宙暗物質湯', desc: '深邃無光，蘊含微型引力奇點。', icon: 'fa-atom', color: 0x1f0038, fogColor: 0x0a0014, meshType: 'broth', stats: { umami: 85, abs: 99, soul: 85, heat: 20, chaos: 95 }, category: 'broth' },
+      { id: 'b3', name: '阿嬤溺愛大骨湯', desc: '金黃琥珀色，撫平平行宇宙傷痛。', icon: 'fa-heart', color: 0xe69d00, fogColor: 0x261700, meshType: 'broth', stats: { umami: 96, abs: 20, soul: 99, heat: 10, chaos: 10 }, category: 'broth' },
+      { id: 'b4', name: '抹茶牛奶青高湯', desc: '微甜濃郁，帶有迷幻綠色微光。', icon: 'fa-leaf', color: 0x2e7d32, fogColor: 0x09260c, meshType: 'broth', stats: { umami: 60, abs: 85, soul: 70, heat: 0, chaos: 75 }, category: 'broth' },
+      { id: 'b5', name: '酸菜白肉古法湯', desc: '酸爽開胃，令舌尖細胞集體歡呼。', icon: 'fa-lemon', color: 0xd4e157, fogColor: 0x1a2100, meshType: 'broth', stats: { umami: 88, abs: 25, soul: 75, heat: 15, chaos: 20 }, category: 'broth' },
+      { id: 'b6', name: '德式黑啤酒高湯', desc: '麥芽香氣濃郁，伴隨微醉泡沫。', icon: 'fa-beer-mug-empty', color: 0x78350f, fogColor: 0x1c0d02, meshType: 'broth', stats: { umami: 80, abs: 60, soul: 75, heat: 30, chaos: 50 }, category: 'broth' },
+      { id: 'b7', name: '泰式冬蔭功酸辣湯', desc: '檸檬香茅與香菜之衝擊波。', icon: 'fa-pepper-hot', color: 0xea580c, fogColor: 0x331000, meshType: 'broth', stats: { umami: 90, abs: 45, soul: 82, heat: 88, chaos: 35 }, category: 'broth' },
+      { id: 'b8', name: '藍色夏威夷海水湯', desc: '清澈湛藍，散發海風與夢幻鹹味。', icon: 'fa-water', color: 0x0284c7, fogColor: 0x032b45, meshType: 'broth', stats: { umami: 70, abs: 90, soul: 80, heat: 5, chaos: 70 }, category: 'broth' },
+      { id: 'b9', name: '純粹空無無味水', desc: '絕對純淨，返璞歸真的哲學湯底。', icon: 'fa-glass-water', color: 0xe2e8f0, fogColor: 0x0f172a, meshType: 'broth', stats: { umami: 10, abs: 95, soul: 90, heat: 0, chaos: 10 }, category: 'broth' },
+      { id: 'b10', name: '濃郁起司牛奶湯', desc: '乳香四溢，牽絲牽到天涯海角。', icon: 'fa-cheese', color: 0xfef08a, fogColor: 0x332a00, meshType: 'broth', stats: { umami: 92, abs: 35, soul: 88, heat: 10, chaos: 30 }, category: 'broth' },
+      { id: 'b11', name: '韓式泡菜衝擊湯', desc: '紅潤發酵酸辣，喚醒沉睡靈魂。', icon: 'fa-fire-flame-curved', color: 0xd97706, fogColor: 0x2b1400, meshType: 'broth', stats: { umami: 86, abs: 30, soul: 78, heat: 80, chaos: 25 }, category: 'broth' },
+      { id: 'b12', name: '養生十全大補藥湯', desc: '中藥甘甜，喝完立馬精力充沛。', icon: 'fa-notes-medical', color: 0x451a03, fogColor: 0x140700, meshType: 'broth', stats: { umami: 85, abs: 40, soul: 95, heat: 40, chaos: 15 }, category: 'broth' },
+      { id: 'b13', name: '熔岩火山口漿湯', desc: '岩漿般咕嚕咕嚕，熱量超越極限。', icon: 'fa-volcano', color: 0xd93838, fogColor: 0x3b0000, meshType: 'broth', stats: { umami: 65, abs: 88, soul: 70, heat: 100, chaos: 85 }, category: 'broth' },
+      { id: 'b14', name: '仙界蟠桃瓊漿湯', desc: '仙氣繚繞，入口即羽化登仙。', icon: 'fa-wand-magic-sparkles', color: 0xf472b6, fogColor: 0x2b061c, meshType: 'broth', stats: { umami: 90, abs: 92, soul: 98, heat: 0, chaos: 60 }, category: 'broth' },
+      { id: 'b15', name: '提神黑咖啡濃湯', desc: '苦澀香醇，熬夜加班人的救星。', icon: 'fa-mug-hot', color: 0x18181b, fogColor: 0x09090b, meshType: 'broth', stats: { umami: 40, abs: 80, soul: 85, heat: 20, chaos: 65 }, category: 'broth' },
+      { id: 'b16', name: '法式松露奶油湯', desc: '奢華無比，帶有黑松露神秘香氣。', icon: 'fa-crown', color: 0xa16207, fogColor: 0x211300, meshType: 'broth', stats: { umami: 98, abs: 50, soul: 90, heat: 15, chaos: 20 }, category: 'broth' },
+      { id: 'b17', name: '四維空間超湯底', desc: '湯汁從第四維度湧出，無法看清全貌。', icon: 'fa-cube', color: 0x6366f1, fogColor: 0x121342, meshType: 'broth', stats: { umami: 75, abs: 100, soul: 85, heat: 30, chaos: 98 }, category: 'broth' },
+      { id: 'b18', name: '暴雨夜孤獨濃湯', desc: '帶著鹹鹹雨水與憂鬱氣息。', icon: 'fa-cloud-showers-heavy', color: 0x475569, fogColor: 0x0f172a, meshType: 'broth', stats: { umami: 50, abs: 85, soul: 92, heat: 5, chaos: 40 }, category: 'broth' },
+      { id: 'b19', name: '懷舊可口可樂高湯', desc: '氣泡翻騰，帶有焦糖甜香衝擊。', icon: 'fa-bottle-droplet', color: 0x991b1b, fogColor: 0x240000, meshType: 'broth', stats: { umami: 55, abs: 88, soul: 70, heat: 10, chaos: 80 }, category: 'broth' },
+      { id: 'b20', name: '印度咖哩黃金湯', desc: '十幾種香料交織，金黃耀眼。', icon: 'fa-sun', color: 0xca8a04, fogColor: 0x291b00, meshType: 'broth', stats: { umami: 92, abs: 40, soul: 80, heat: 75, chaos: 30 }, category: 'broth' },
+
+      // ----------------- CAT 2: MEATS & PROTEINS (Round 2) -----------------
+      { id: 'm1', name: 'A5和牛雪花卷', desc: '大理石油脂，接觸熱湯即化為幸福。', icon: 'fa-drumstick-bite', color: 0xd93838, meshType: 'wagyu', stats: { umami: 99, abs: 15, soul: 88, heat: 0, chaos: 10 }, category: 'meat' },
+      { id: 'm2', name: '量子薛丁格肉丸', desc: '咬下前同時處於美味與未熟疊加態。', icon: 'fa-cubes-stacked', color: 0x00e5ff, meshType: 'quantum_ball', stats: { umami: 75, abs: 96, soul: 80, heat: 0, chaos: 90 }, category: 'meat' },
+      { id: 'm3', name: '考前一晚的焦慮', desc: '印有紅色 F，蘊含大學生終極悲憤。', icon: 'fa-file-lines', color: 0xf3f4f6, meshType: 'exam_paper', stats: { umami: 10, abs: 92, soul: 95, heat: 80, chaos: 85 }, category: 'meat' },
+      { id: 'm4', name: '波士頓帝王龍蝦爪', desc: '霸氣鮮紅，散發海洋頂級帝王霸氣。', icon: 'fa-fish', color: 0xe63946, meshType: 'lobster', stats: { umami: 97, abs: 30, soul: 88, heat: 0, chaos: 20 }, category: 'meat' },
+      { id: 'm5', name: '量子糾纏態豆腐', desc: '兩塊豆腐跨越時空同步吸收湯汁。', icon: 'fa-cube', color: 0xffffff, meshType: 'quantum_tofu', stats: { umami: 82, abs: 92, soul: 75, heat: 0, chaos: 80 }, category: 'meat' },
+      { id: 'm6', name: '爆汁狂怒貢丸', desc: '彈性極佳，可在鍋中蹦跳三米高。', icon: 'fa-circle', color: 0x8d6e63, meshType: 'meatball', stats: { umami: 85, abs: 40, soul: 70, heat: 30, chaos: 50 }, category: 'meat' },
+      { id: 'm7', name: '404 Bug 程式碼', desc: '無法編譯的語法，造成湯鍋記憶體溢位。', icon: 'fa-code', color: 0x22c55e, meshType: 'bugcode', stats: { umami: 20, abs: 98, soul: 85, heat: 0, chaos: 99 }, category: 'meat' },
+      { id: 'm8', name: '西班牙伊比利豬梅花', desc: '吃橡實長大，帶著獨特堅果香。', icon: 'fa-piggy-bank', color: 0xf87171, meshType: 'wagyu', stats: { umami: 94, abs: 20, soul: 82, heat: 0, chaos: 15 }, category: 'meat' },
+      { id: 'm9', name: '深海巨型章魚腳', desc: '吸盤緊吸湯汁，口感超有彈性。', icon: 'fa-octopus-deploy', color: 0x9333ea, meshType: 'octopus', stats: { umami: 90, abs: 65, soul: 78, heat: 0, chaos: 45 }, category: 'meat' },
+      { id: 'm10', name: '飛天獨角獸嫩肉', desc: '帶有虹光，口感如同踩在雲端。', icon: 'fa-horse', color: 0xf472b6, meshType: 'unicorn_tear', stats: { umami: 88, abs: 95, soul: 92, heat: 0, chaos: 70 }, category: 'meat' },
+      { id: 'm11', name: '秘製滷香鴨血', desc: '滑嫩如絲，咬下瞬間麻辣噴發。', icon: 'fa-droplet', color: 0x450a0a, meshType: 'meatball', stats: { umami: 93, abs: 25, soul: 85, heat: 85, chaos: 30 }, category: 'meat' },
+      { id: 'm12', name: '鮮嫩黃金雕魚片', desc: '無刺刀工，入鍋即化。', icon: 'fa-fish-fins', color: 0xfde047, meshType: 'cabbage', stats: { umami: 89, abs: 10, soul: 70, heat: 0, chaos: 5 }, category: 'meat' },
+      { id: 'm13', name: '爆漿起司牛肉丸', desc: '內藏濃郁熱起司岩漿。', icon: 'fa-circle-dot', color: 0xb91c1c, meshType: 'meatball', stats: { umami: 92, abs: 30, soul: 80, heat: 20, chaos: 35 }, category: 'meat' },
+      { id: 'm14', name: '資本主義剩餘價值', desc: '看似豐富，其實全是加班的血汗。', icon: 'fa-coins', color: 0xeab308, meshType: 'boss_promise', stats: { umami: 30, abs: 94, soul: 90, heat: 50, chaos: 88 }, category: 'meat' },
+      { id: 'm15', name: '星期一早晨厭世感', desc: '沉重無比，能迅速降低湯鍋溫度。', icon: 'fa-face-frown', color: 0x64748b, meshType: 'exam_paper', stats: { umami: 15, abs: 90, soul: 88, heat: 0, chaos: 75 }, category: 'meat' },
+      { id: 'm16', name: '北海道生食級干貝', desc: '甘甜頂級，鮮美衝擊舌尖。', icon: 'fa-gem', color: 0xffedd5, meshType: 'pure_reason', stats: { umami: 98, abs: 15, soul: 85, heat: 0, chaos: 10 }, category: 'meat' },
+      { id: 'm17', name: '太空隕石碎肉餅', desc: '經過外太空高溫烘烤，風味奇特。', icon: 'fa-meteor', color: 0x44403c, meshType: 'meatball', stats: { umami: 60, abs: 92, soul: 75, heat: 90, chaos: 90 }, category: 'meat' },
+      { id: 'm18', name: '哥吉拉放射性肉塊', desc: '發出綠色熒光，微幅提升熱能。', icon: 'fa-biohazard', color: 0x15803d, meshType: 'bugcode', stats: { umami: 50, abs: 96, soul: 80, heat: 95, chaos: 95 }, category: 'meat' },
+      { id: 'm19', name: '香濃九轉大腸', desc: '保留了一部分原本的味道，廚藝巔峰。', icon: 'fa-compact-disc', color: 0xb45309, meshType: 'soul_ring', stats: { umami: 91, abs: 95, soul: 98, heat: 40, chaos: 92 }, category: 'meat' },
+      { id: 'm20', name: '遠古恐龍肋排', desc: '蘊含侏儸紀時代的蠻荒霸氣。', icon: 'fa-bone', color: 0x78350f, meshType: 'dino_rib', stats: { umami: 90, abs: 80, soul: 82, heat: 20, chaos: 60 }, category: 'meat' },
+
+      // ----------------- CAT 3: VEGGIES & FUNGI (Round 3) -----------------
+      { id: 'v1', name: '高山有機高麗菜', desc: '清甜脆口，記錄著清晨露水記憶。', icon: 'fa-seedling', color: 0x4ade80, meshType: 'cabbage', stats: { umami: 75, abs: 10, soul: 60, heat: 0, chaos: 5 }, category: 'veg' },
+      { id: 'v2', name: '沉思哲學黑木耳', desc: '不斷思考「我為何被煮」的形而上難題。', icon: 'fa-brain', color: 0x1c1917, meshType: 'woodear', stats: { umami: 65, abs: 88, soul: 80, heat: 0, chaos: 60 }, category: 'veg' },
+      { id: 'v3', name: '不屈金針菇 (See You Tomorrow)', desc: '無論經過何種消化，明天依然相見。', icon: 'fa-infinity', color: 0xfef08a, meshType: 'enoki', stats: { umami: 70, abs: 85, soul: 70, heat: 0, chaos: 70 }, category: 'veg' },
+      { id: 'v4', name: '貓咪的溫柔呼嚕聲', desc: '粉紅溫柔波形，讓鍋物散發治癒力。', icon: 'fa-cat', color: 0xf472b6, meshType: 'catpurr', stats: { umami: 50, abs: 94, soul: 99, heat: 0, chaos: 30 }, category: 'veg' },
+      { id: 'v5', name: '炸響鈴千層黃金豆皮', desc: '秒吸收湯汁精華，酥脆與軟嫩兼備。', icon: 'fa-scroll', color: 0xfacc15, meshType: 'beancurd', stats: { umami: 92, abs: 20, soul: 70, heat: 0, chaos: 15 }, category: 'veg' },
+      { id: 'v6', name: '化學平衡常數', desc: '正逆反應速率相等，維持湯底調和。', icon: 'fa-flask', color: 0x38bdf8, meshType: 'chem_const', stats: { umami: 40, abs: 92, soul: 65, heat: 0, chaos: 85 }, category: 'veg' },
+      { id: 'v7', name: '爆汁甜玉米段', desc: '顆粒飽滿，甘甜汁液噴發。', icon: 'fa-stroopwafel', color: 0xeab308, meshType: 'meatball', stats: { umami: 82, abs: 10, soul: 65, heat: 0, chaos: 5 }, category: 'veg' },
+      { id: 'v8', name: '森林野生松露菇', desc: '散發濃郁大地幽香。', icon: 'fa-cloud', color: 0x44403c, meshType: 'woodear', stats: { umami: 95, abs: 45, soul: 80, heat: 0, chaos: 20 }, category: 'veg' },
+      { id: 'v9', name: '催眠紫甘藍葉', desc: '紫光流轉，令人眼神漸漸呆滯。', icon: 'fa-eye', color: 0xa855f7, meshType: 'cabbage', stats: { umami: 60, abs: 80, soul: 75, heat: 0, chaos: 50 }, category: 'veg' },
+      { id: 'v10', name: '吸湯大芋頭塊', desc: '煮到綿密鬆軟，湯汁完美融合。', icon: 'fa-cubes', color: 0xd8b4fe, meshType: 'quantum_tofu', stats: { umami: 88, abs: 30, soul: 78, heat: 0, chaos: 20 }, category: 'veg' },
+      { id: 'v11', name: '食人花咬咬葉', desc: '偶爾會咬住別的食材，搶奪鮮味。', icon: 'fa-plant-wilt', color: 0x16a34a, meshType: 'cabbage', stats: { umami: 65, abs: 88, soul: 70, heat: 10, chaos: 75 }, category: 'veg' },
+      { id: 'v12', name: '萬物生長幸運四葉草', desc: '提升整鍋火鍋的運氣值。', icon: 'fa-clover', color: 0x22c55e, meshType: 'cabbage', stats: { umami: 70, abs: 60, soul: 95, heat: 0, chaos: 10 }, category: 'veg' },
+      { id: 'v13', name: '翡翠娃娃菜', desc: '嫩白透綠，吸飽精華高湯。', icon: 'fa-spa', color: 0x86efac, meshType: 'cabbage', stats: { umami: 80, abs: 10, soul: 60, heat: 0, chaos: 5 }, category: 'veg' },
+      { id: 'v14', name: '延年益壽人參根', desc: '長滿鬚根，散發濃烈補氣之味。', icon: 'fa-staff-snake', color: 0xd97706, meshType: 'enoki', stats: { umami: 85, abs: 50, soul: 96, heat: 15, chaos: 15 }, category: 'veg' },
+      { id: 'v15', name: '迷幻魔幻彩虹菇', desc: '吃了會看到小人在眼前跳舞。', icon: 'fa-wand-magic', color: 0xec4899, meshType: 'woodear', stats: { umami: 50, abs: 99, soul: 90, heat: 0, chaos: 95 }, category: 'veg' },
+      { id: 'v16', name: '脆爽水陸蓮藕片', desc: '孔洞透光，吸滿湯汁香氣。', icon: 'fa-wheelchair', color: 0xfef3c7, meshType: 'pure_reason', stats: { umami: 82, abs: 20, soul: 65, heat: 0, chaos: 10 }, category: 'veg' },
+      { id: 'v17', name: '太陽花日光精華', desc: '凝結整天太陽光合作用光芒。', icon: 'fa-sun', color: 0xfacc15, meshType: 'pure_reason', stats: { umami: 75, abs: 70, soul: 88, heat: 30, chaos: 20 }, category: 'veg' },
+      { id: 'v18', name: '深海昆布長壽帶', desc: '來自百米深海，天然穀氨酸精華。', icon: 'fa-ribbon', color: 0x14532d, meshType: 'beancurd', stats: { umami: 95, abs: 15, soul: 70, heat: 0, chaos: 10 }, category: 'veg' },
+      { id: 'v19', name: '綠藻微型生態系', desc: '自成一格的綠色小宇宙。', icon: 'fa-globe', color: 0x15803d, meshType: 'catpurr', stats: { umami: 60, abs: 85, soul: 75, heat: 0, chaos: 60 }, category: 'veg' },
+      { id: 'v20', name: '智慧樹果實', desc: '咬一口智商暫時提升 50%。', icon: 'fa-apple-whole', color: 0xd97706, meshType: 'meatball', stats: { umami: 78, abs: 90, soul: 92, heat: 0, chaos: 40 }, category: 'veg' },
+
+      // ----------------- CAT 4: SAUCES & DIPS (Round 4) -----------------
+      { id: 's1', name: '特調蒜泥沙茶醬', desc: '經典台味靈魂，蒜香濃郁拉滿。', icon: 'fa-jar', color: 0x78350f, meshType: 'sauce_dollop', stats: { umami: 95, abs: 15, soul: 88, heat: 40, chaos: 20 }, category: 'sauce' },
+      { id: 's2', name: '四維跨時空超辣油', desc: '辣度穿透第四維度，觸發跨時空痛覺。', icon: 'fa-pepper-hot', color: 0xef4444, meshType: 'chili_oil', stats: { umami: 60, abs: 95, soul: 85, heat: 100, chaos: 90 }, category: 'sauce' },
+      { id: 's3', name: '老闆的畫大餅', desc: '看似充實，裡面全是空氣與虛無。', icon: 'fa-cloud', color: 0x94a3b8, meshType: 'boss_promise', stats: { umami: 0, abs: 95, soul: 95, heat: 50, chaos: 95 }, category: 'sauce' },
+      { id: 's4', name: '珍珠奶茶黑糖靈魂', desc: '黑糖珍珠落入麻辣湯，奇蹟甜鹹衝突。', icon: 'fa-glass-water', color: 0x451a03, meshType: 'boba_tea', stats: { umami: 50, abs: 96, soul: 90, heat: 10, chaos: 92 }, category: 'sauce' },
+      { id: 's5', name: '24K 純金箔碎片', desc: '閃耀奢華光芒，令這鍋湯價格翻倍。', icon: 'fa-coins', color: 0xffd700, meshType: 'gold_leaf', stats: { umami: 30, abs: 85, soul: 80, heat: 0, chaos: 40 }, category: 'sauce' },
+      { id: 's6', name: '純粹理性結晶鹽', desc: '剔透多面體，洗滌一切世俗貪婪。', icon: 'fa-gem', color: 0xe0f2fe, meshType: 'pure_reason', stats: { umami: 20, abs: 96, soul: 90, heat: 0, chaos: 60 }, category: 'sauce' },
+      { id: 's7', name: '泰式檸檬香茅醬', desc: '微酸清爽，瞬間化解油膩。', icon: 'fa-lemon', color: 0xa3e635, meshType: 'sauce_dollop', stats: { umami: 82, abs: 30, soul: 70, heat: 20, chaos: 15 }, category: 'sauce' },
+      { id: 's8', name: '秘製十三香麻辣粉', desc: '層次豐富，香氣直衝腦門。', icon: 'fa-mortar-pestle', color: 0x991b1b, meshType: 'chili_oil', stats: { umami: 88, abs: 40, soul: 82, heat: 92, chaos: 30 }, category: 'sauce' },
+      { id: 's9', name: '濃稠日式胡麻醬', desc: '芝麻濃香，口感絲滑溫順。', icon: 'fa-bowl-rice', color: 0xd97706, meshType: 'sauce_dollop', stats: { umami: 91, abs: 10, soul: 75, heat: 0, chaos: 5 }, category: 'sauce' },
+      { id: 's10', name: '滿滿蔥花香菜瀑布', desc: '香菜愛好者的天堂，討厭者的噩夢。', icon: 'fa-seedling', color: 0x15803d, meshType: 'cabbage', stats: { umami: 85, abs: 70, soul: 88, heat: 0, chaos: 65 }, category: 'sauce' },
+      { id: 's11', name: '宇宙微波背景輻射鹽', desc: '帶有 Big Bang 爆炸留下的餘溫。', icon: 'fa-satellite-dish', color: 0x818cf8, meshType: 'pure_reason', stats: { umami: 40, abs: 98, soul: 85, heat: 40, chaos: 80 }, category: 'sauce' },
+      { id: 's12', name: '芥末衝腦衝擊醬', desc: '直擊鼻腔靈魂，眼淚不由自主流下。', icon: 'fa-burst', color: 0x84cc16, meshType: 'sauce_dollop', stats: { umami: 65, abs: 75, soul: 80, heat: 85, chaos: 70 }, category: 'sauce' },
+      { id: 's13', name: '初戀酸甜滋味醬', desc: '酸酸甜甜，帶著微苦的青澀回憶。', icon: 'fa-heart-crack', color: 0xf43f5e, meshType: 'unicorn_tear', stats: { umami: 70, abs: 80, soul: 95, heat: 0, chaos: 50 }, category: 'sauce' },
+      { id: 's14', name: '靈魂提味魔鬼辣椒', desc: '百萬史高維爾，舌頭即刻燃燒。', icon: 'fa-fire', color: 0xb91c1c, meshType: 'chili_oil', stats: { umami: 50, abs: 60, soul: 75, heat: 100, chaos: 85 }, category: 'sauce' },
+      { id: 's15', name: '熟成黑蒜精華汁', desc: '發酵蒜香，無臭且甘甜濃醇。', icon: 'fa-droplet', color: 0x27272a, meshType: 'sauce_dollop', stats: { umami: 94, abs: 35, soul: 85, heat: 10, chaos: 20 }, category: 'sauce' },
+      { id: 's16', name: '松露蒜味蛋黃醬', desc: '罪惡美味，熱量爆棚的極致享受。', icon: 'fa-egg', color: 0xfde047, meshType: 'sauce_dollop', stats: { umami: 96, abs: 25, soul: 82, heat: 0, chaos: 15 }, category: 'sauce' },
+      { id: 's17', name: '帕瑪森起司雪花', desc: '現磨起司如細雪般飄落。', icon: 'fa-snowflake', color: 0xfffbeb, meshType: 'gold_leaf', stats: { umami: 90, abs: 15, soul: 75, heat: 0, chaos: 10 }, category: 'sauce' },
+      { id: 's18', name: '熬夜加班咖啡因粉', desc: '提供強烈中樞神經刺激波。', icon: 'fa-pills', color: 0x78350f, meshType: 'chili_oil', stats: { umami: 30, abs: 85, soul: 90, heat: 30, chaos: 75 }, category: 'sauce' },
+      { id: 's19', name: '滿滿油條雙胞胎', desc: '入鍋秒吸半鍋高湯，極度吸汁。', icon: 'fa-burger', color: 0xd97706, meshType: 'beancurd', stats: { umami: 92, abs: 20, soul: 70, heat: 0, chaos: 20 }, category: 'sauce' },
+      { id: 's20', name: '傳承百年老滷汁', desc: '跨越世紀的陳年旨味沉澱。', icon: 'fa-flask-vial', color: 0x451a03, meshType: 'sauce_dollop', stats: { umami: 98, abs: 40, soul: 92, heat: 20, chaos: 30 }, category: 'sauce' },
+
+      // ----------------- CAT 5: ARTIFACTS & SOUL (Round 5) -----------------
+      { id: 'a1', name: '溏心溫泉黃金聖蛋', desc: '切開流出如恆星核心璀璨黃金蛋汁。', icon: 'fa-egg', color: 0xfacc15, meshType: 'golden_egg', stats: { umami: 96, abs: 25, soul: 94, heat: 0, chaos: 10 }, category: 'artifact' },
+      { id: 'a2', name: '獨角獸七彩淚滴', desc: '七彩虹光，吃一口皮膚倒退十年。', icon: 'fa-droplet', color: 0xec4899, meshType: 'unicorn_tear', stats: { umami: 80, abs: 98, soul: 96, heat: 0, chaos: 85 }, category: 'artifact' },
+      { id: 'a3', name: '坍縮微型黑洞', desc: '無底深淵，連光線都無法逃脫其引力。', icon: 'fa-circle-dot', color: 0x000000, meshType: 'blackhole', stats: { umami: 10, abs: 100, soul: 90, heat: 70, chaos: 100 }, category: 'artifact' },
+      { id: 'a4', name: '四維超正方體', desc: '投影至三維空間的幾何神蹟結構。', icon: 'fa-cube', color: 0x818cf8, meshType: 'tesseract', stats: { umami: 40, abs: 99, soul: 88, heat: 0, chaos: 95 }, category: 'artifact' },
+      { id: 'a5', name: '九轉大腸哲學靈魂', desc: '保留了一部分原本的味道，廚藝巔峰。', icon: 'fa-compact-disc', color: 0xb45309, meshType: 'soul_ring', stats: { umami: 88, abs: 99, soul: 100, heat: 50, chaos: 98 }, category: 'artifact' },
+      { id: 'a6', name: '柴犬的治癒微笑', desc: '治癒一切不開心，湯底瞬間充滿陽光。', icon: 'fa-dog', color: 0xf97316, meshType: 'shiba', stats: { umami: 92, abs: 85, soul: 100, heat: 0, chaos: 20 }, category: 'artifact' },
+      { id: 'a7', name: '剛領到的終極年終獎金', desc: '厚厚一包，散發出自由與財富香氣。', icon: 'fa-money-bill-wave', color: 0x22c55e, meshType: 'exam_paper', stats: { umami: 85, abs: 80, soul: 99, heat: 0, chaos: 30 }, category: 'artifact' },
+      { id: 'a8', name: '永遠拉不直的自然捲', desc: '彈力十足，纏繞整鍋食材。', icon: 'fa-spaghetti-monster-flying', color: 0x78350f, meshType: 'enoki', stats: { umami: 30, abs: 90, soul: 75, heat: 0, chaos: 80 }, category: 'artifact' },
+      { id: 'a9', name: '時間領主的懷錶', desc: '能讓湯鍋裡的牛肉倒退至最佳熟度。', icon: 'fa-clock', color: 0xeab308, meshType: 'pure_reason', stats: { umami: 70, abs: 98, soul: 92, heat: 0, chaos: 85 }, category: 'artifact' },
+      { id: 'a10', name: '鳳凰涅槃不滅火焰', desc: '永遠不會熄滅，持續提供強大火力。', icon: 'fa-fire-burner', color: 0xef4444, meshType: 'chili_oil', stats: { umami: 60, abs: 85, soul: 90, heat: 100, chaos: 70 }, category: 'artifact' },
+      { id: 'a11', name: '人類終極開悟結晶', desc: '閃耀著純粹智慧之光。', icon: 'fa-brain', color: 0x38bdf8, meshType: 'pure_reason', stats: { umami: 80, abs: 99, soul: 98, heat: 0, chaos: 50 }, category: 'artifact' },
+      { id: 'a12', name: '魔法少女變身棒', desc: '讓整鍋火鍋發出粉紅少女光芒。', icon: 'fa-wand-magic-sparkles', color: 0xf472b6, meshType: 'unicorn_tear', stats: { umami: 75, abs: 95, soul: 96, heat: 0, chaos: 88 }, category: 'artifact' },
+      { id: 'a13', name: '多重宇宙躍遷符咒', desc: '撕開空間，召喚平行宇宙湯底。', icon: 'fa-paper-plane', color: 0xa855f7, meshType: 'exam_paper', stats: { umami: 50, abs: 100, soul: 90, heat: 0, chaos: 99 }, category: 'artifact' },
+      { id: 'a14', name: '蒙娜麗莎神秘微笑', desc: '無論從哪個角度看，這鍋湯都在對你笑。', icon: 'fa-face-smile-beam', color: 0xca8a04, meshType: 'boss_promise', stats: { umami: 82, abs: 96, soul: 90, heat: 0, chaos: 60 }, category: 'artifact' },
+      { id: 'a15', name: '滿級大師魔法藥水', desc: '調和一切衝突風味，達成完美平衡。', icon: 'fa-flask', color: 0x06b6d4, meshType: 'chem_const', stats: { umami: 95, abs: 90, soul: 95, heat: 0, chaos: 20 }, category: 'artifact' },
+      { id: 'a16', name: '永遠下載 99% 的進度條', desc: '誘發無窮強迫症與焦慮波。', icon: 'fa-spinner', color: 0x3b82f6, meshType: 'bugcode', stats: { umami: 10, abs: 98, soul: 88, heat: 0, chaos: 95 }, category: 'artifact' },
+      { id: 'a17', name: '創世者神聖叉子', desc: '插起食材瞬間賦予其靈魂。', icon: 'fa-utensils', color: 0xfacc15, meshType: 'golden_egg', stats: { umami: 90, abs: 85, soul: 95, heat: 0, chaos: 30 }, category: 'artifact' },
+      { id: 'a18', name: '歐皇附體滿幸運符', desc: '必定煮出高分特級神聖湯底。', icon: 'fa-clover', color: 0x22c55e, meshType: 'pure_reason', stats: { umami: 88, abs: 80, soul: 100, heat: 0, chaos: 10 }, category: 'artifact' },
+      { id: 'a19', name: '阿卡西記錄宇宙編年史', desc: '記載全宇宙食譜的古老典籍。', icon: 'fa-book-skull', color: 0x6b21a8, meshType: 'exam_paper', stats: { umami: 85, abs: 99, soul: 95, heat: 0, chaos: 85 }, category: 'artifact' },
+      { id: 'a20', name: '永恆流轉莫比烏斯環', desc: '美味無限循環，永無止境。', icon: 'fa-infinity', color: 0x38bdf8, meshType: 'tesseract', stats: { umami: 90, abs: 98, soul: 92, heat: 0, chaos: 90 }, category: 'artifact' },
+      { id: 'a21', name: '主人的溫柔踩踏吐司', desc: '充滿治癒與滿滿的貓咪愛意。', icon: 'fa-bread-slice', color: 0xfde047, meshType: 'beancurd', stats: { umami: 85, abs: 92, soul: 99, heat: 0, chaos: 40 }, category: 'artifact' }
+    ];
+
+    /* =========================================================================
+       3. THREE.JS SCENE SETUP & LIGHTING
+       ========================================================================= */
+    let scene, camera, renderer, controls;
+    let potGroup, liquidMesh, liquidMaterial;
+    let lidDomeMesh, lightBeamMesh;
+    let steamParticles = [], bubbleParticles = [], flameLights = [];
+    let floatingItems = [];
+    let currentBrothColor = 0xcc1100;
+    let isGameFinished = false;
+    let isRitualActive = false;
+
+    const gameState = {
+      currentRound: 0,
+      chosenItems: [],
+      usedIds: new Set(),
+      stats: { umami: 0, abs: 0, soul: 0, heat: 0, chaos: 0 }
+    };
+
+    function init3DScene() {
+      const container = document.getElementById('canvas-container');
+
+      scene = new THREE.Scene();
+      scene.background = new THREE.Color(0x030712);
+      scene.fog = new THREE.FogExp2(0x030712, 0.032);
+
+      camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 100);
+      camera.position.set(0, 9.5, 13.5);
+
+      // WebGLRenderer with preserveDrawingBuffer enabled for high quality PNG snapshot!
+      renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, preserveDrawingBuffer: true });
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+      renderer.shadowMap.enabled = true;
+      renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+      renderer.toneMapping = THREE.ACESFilmicToneMapping;
+      renderer.toneMappingExposure = 1.25;
+      container.appendChild(renderer.domElement);
+
+      controls = new THREE.OrbitControls(camera, renderer.domElement);
+      controls.enableDamping = true;
+      controls.dampingFactor = 0.05;
+      controls.maxPolarAngle = Math.PI / 2.1;
+      controls.minDistance = 6;
+      controls.maxDistance = 22;
+      controls.target.set(0, 1.2, 0);
+
+      setupLighting();
+      buildTableAndStove();
+      buildHotPot();
+      setupRitualVisualFX();
+      setupSteamAndBubbles();
+
+      window.addEventListener('resize', onWindowResize);
+    }
+
+    function setupLighting() {
+      const ambientLight = new THREE.AmbientLight(0xffe8d6, 0.75);
+      scene.add(ambientLight);
+
+      const mainSpot = new THREE.SpotLight(0xfffaed, 2.5);
+      mainSpot.position.set(6, 16, 9);
+      mainSpot.angle = Math.PI / 4;
+      mainSpot.penumbra = 0.5;
+      mainSpot.castShadow = true;
+      scene.add(mainSpot);
+
+      // Under-stove flickering fire point light
+      const fireLight = new THREE.PointLight(0xff4500, 3.0, 7);
+      fireLight.position.set(0, 0.2, 0);
+      scene.add(fireLight);
+      flameLights.push(fireLight);
+
+      const rimLight = new THREE.DirectionalLight(0x38bdf8, 0.9);
+      rimLight.position.set(-8, 6, -8);
+      scene.add(rimLight);
+    }
+
+    function buildTableAndStove() {
+      // Table
+      const tableGeo = new THREE.CylinderGeometry(12, 12, 0.5, 32);
+      const tableMat = new THREE.MeshStandardMaterial({ color: 0x0f172a, roughness: 0.65, metalness: 0.2 });
+      const table = new THREE.Mesh(tableGeo, tableMat);
+      table.position.y = -0.25;
+      table.receiveShadow = true;
+      scene.add(table);
+
+      // Induction Cooker
+      const stoveGeo = new THREE.CylinderGeometry(4.8, 5.0, 0.3, 32);
+      const stoveMat = new THREE.MeshStandardMaterial({ color: 0x020617, roughness: 0.2, metalness: 0.85 });
+      const stove = new THREE.Mesh(stoveGeo, stoveMat);
+      stove.position.y = 0.15;
+      stove.receiveShadow = true;
+      scene.add(stove);
+
+      // Glowing Heating Ring
+      const ringGeo = new THREE.RingGeometry(3.2, 3.6, 32);
+      const ringMat = new THREE.MeshBasicMaterial({ color: 0xef4444, side: THREE.DoubleSide });
+      const ring = new THREE.Mesh(ringGeo, ringMat);
+      ring.rotation.x = Math.PI / 2;
+      ring.position.y = 0.31;
+      scene.add(ring);
+    }
+
+    function buildHotPot() {
+      potGroup = new THREE.Group();
+
+      // Outer Metal Pot Body
+      const potBodyGeo = new THREE.CylinderGeometry(4.2, 3.6, 2.2, 32, 1, true);
+      const potBodyMat = new THREE.MeshStandardMaterial({
+        color: 0x27272a, metalness: 0.85, roughness: 0.25, side: THREE.DoubleSide
+      });
+      const potBody = new THREE.Mesh(potBodyGeo, potBodyMat);
+      potBody.position.y = 1.4;
+      potBody.castShadow = true;
+      potGroup.add(potBody);
+
+      // Brass Rim
+      const rimGeo = new THREE.TorusGeometry(4.25, 0.15, 16, 32);
+      const rimMat = new THREE.MeshStandardMaterial({ color: 0xd97706, metalness: 0.9, roughness: 0.2 });
+      const rim = new THREE.Mesh(rimGeo, rimMat);
+      rim.rotation.x = Math.PI / 2;
+      rim.position.y = 2.5;
+      potGroup.add(rim);
+
+      // Side Handles
+      for (let dir of [-1, 1]) {
+        const handleGeo = new THREE.TorusGeometry(0.7, 0.12, 12, 24, Math.PI);
+        const handle = new THREE.Mesh(handleGeo, rimMat);
+        handle.position.set(dir * 4.35, 2.0, 0);
+        handle.rotation.y = dir * (Math.PI / 2);
+        handle.rotation.x = -Math.PI / 4;
+        potGroup.add(handle);
+      }
+
+      // Pot Bottom
+      const bottomGeo = new THREE.CylinderGeometry(3.6, 3.6, 0.1, 32);
+      const bottom = new THREE.Mesh(bottomGeo, potBodyMat);
+      bottom.position.y = 0.35;
+      potGroup.add(bottom);
+
+      // Boiling Liquid Surface
+      const liquidGeo = new THREE.CircleGeometry(4.0, 48);
+      liquidGeo.rotateX(-Math.PI / 2);
+
+      liquidMaterial = new THREE.MeshStandardMaterial({
+        color: currentBrothColor,
+        roughness: 0.1,
+        metalness: 0.1,
+        transparent: true,
+        opacity: 0.92,
+        emissive: 0x330500,
+        emissiveIntensity: 0.35
+      });
+
+      liquidMesh = new THREE.Mesh(liquidGeo, liquidMaterial);
+      liquidMesh.position.y = 2.1;
+      potGroup.add(liquidMesh);
+
+      scene.add(potGroup);
+    }
+
+    function setupRitualVisualFX() {
+      // 1. Magic Seal Dome Mesh (Descends during Ceremony)
+      const lidGeo = new THREE.SphereGeometry(4.2, 32, 16, 0, Math.PI * 2, 0, Math.PI / 2);
+      const lidMat = new THREE.MeshPhysicalMaterial({
+        color: 0xfacc15,
+        emissive: 0xea580c,
+        emissiveIntensity: 0.8,
+        transparent: true,
+        opacity: 0.0,
+        roughness: 0.1,
+        transmission: 0.6,
+        wireframe: true
+      });
+      lidDomeMesh = new THREE.Mesh(lidGeo, lidMat);
+      lidDomeMesh.position.set(0, 15, 0); // Start high in sky
+      scene.add(lidDomeMesh);
+
+      // 2. Vertical Light Beam
+      const beamGeo = new THREE.CylinderGeometry(2.0, 3.5, 25, 32, 1, true);
+      const beamMat = new THREE.MeshBasicMaterial({
+        color: 0xfacc15,
+        transparent: true,
+        opacity: 0.0,
+        side: THREE.DoubleSide,
+        blending: THREE.AdditiveBlending
+      });
+      lightBeamMesh = new THREE.Mesh(beamGeo, beamMat);
+      lightBeamMesh.position.set(0, 12, 0);
+      scene.add(lightBeamMesh);
+    }
+
+    function setupSteamAndBubbles() {
+      // Steam
+      const steamGeo = new THREE.SphereGeometry(0.25, 8, 8);
+      const steamMat = new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.15 });
+
+      for (let i = 0; i < 35; i++) {
+        const steam = new THREE.Mesh(steamGeo, steamMat.clone());
+        resetSteamParticle(steam);
+        steam.position.y = 2.1 + Math.random() * 3;
+        scene.add(steam);
+        steamParticles.push(steam);
+      }
+
+      // Bubbles
+      const bubbleGeo = new THREE.SphereGeometry(0.12, 8, 8);
+      const bubbleMat = new THREE.MeshStandardMaterial({ color: 0xffa500, roughness: 0.1, transparent: true, opacity: 0.75 });
+
+      for (let i = 0; i < 25; i++) {
+        const bubble = new THREE.Mesh(bubbleGeo, bubbleMat);
+        resetBubbleParticle(bubble);
+        scene.add(bubble);
+        bubbleParticles.push(bubble);
+      }
+    }
+
+    function resetSteamParticle(p) {
+      const angle = Math.random() * Math.PI * 2;
+      const r = Math.random() * 3.3;
+      p.position.set(Math.cos(angle) * r, 2.2, Math.sin(angle) * r);
+      p.scale.setScalar(0.5 + Math.random() * 0.9);
+      p.material.opacity = 0.15 + Math.random() * 0.1;
+    }
+
+    function resetBubbleParticle(p) {
+      const angle = Math.random() * Math.PI * 2;
+      const r = Math.random() * 3.5;
+      p.position.set(Math.cos(angle) * r, 2.1, Math.sin(angle) * r);
+      p.scale.setScalar(0.3 + Math.random() * 0.7);
+    }
+
+    /* =========================================================================
+       4. PROCEDURAL 3D INGREDIENT MESH FACTORY
+       ========================================================================= */
+    function createIngredient3DMesh(item) {
+      const group = new THREE.Group();
+
+      switch (item.meshType) {
+        case 'wagyu': {
+          const geo = new THREE.CylinderGeometry(0.45, 0.45, 1.2, 16);
+          const mat = new THREE.MeshStandardMaterial({ color: 0xd93838, roughness: 0.4 });
+          const mesh = new THREE.Mesh(geo, mat);
+          mesh.rotation.z = Math.PI / 2;
+          
+          const fatGeo = new THREE.TorusGeometry(0.46, 0.04, 8, 16);
+          const fatMat = new THREE.MeshStandardMaterial({ color: 0xfff5f5, roughness: 0.3 });
+          for (let i = -0.4; i <= 0.4; i += 0.4) {
+            const fat = new THREE.Mesh(fatGeo, fatMat);
+            fat.position.x = i; fat.rotation.y = Math.PI / 2;
+            group.add(fat);
+          }
+          group.add(mesh);
+          break;
+        }
+
+        case 'quantum_ball': {
+          const geo = new THREE.IcosahedronGeometry(0.55, 1);
+          const mat = new THREE.MeshStandardMaterial({ color: 0x00e5ff, wireframe: true, emissive: 0x0088cc });
+          const core = new THREE.Mesh(new THREE.SphereGeometry(0.3, 12, 12), new THREE.MeshBasicMaterial({ color: 0xff00aa }));
+          group.add(new THREE.Mesh(geo, mat), core);
+          break;
+        }
+
+        case 'exam_paper': {
+          const geo = new THREE.PlaneGeometry(0.8, 1.1);
+          const mat = new THREE.MeshStandardMaterial({ color: 0xf8fafc, side: THREE.DoubleSide });
+          const mesh = new THREE.Mesh(geo, mat);
+          mesh.rotation.x = Math.PI / 2;
+          const mark = new THREE.Mesh(new THREE.SphereGeometry(0.15, 8, 8), new THREE.MeshBasicMaterial({ color: 0xef4444 }));
+          mark.position.set(0.15, 0.05, 0.15);
+          group.add(mesh, mark);
+          break;
+        }
+
+        case 'lobster': {
+          const body = new THREE.Mesh(new THREE.CylinderGeometry(0.3, 0.2, 1.1, 12), new THREE.MeshStandardMaterial({ color: 0xe63946, roughness: 0.3 }));
+          body.rotation.z = Math.PI / 2;
+          const claw = new THREE.Mesh(new THREE.SphereGeometry(0.35, 8, 8), new THREE.MeshStandardMaterial({ color: 0xef4444 }));
+          claw.scale.set(1.4, 0.6, 0.8); claw.position.set(0.7, 0, 0.2);
+          group.add(body, claw);
+          break;
+        }
+
+        case 'quantum_tofu': {
+          const mat = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.2, transparent: true, opacity: 0.85 });
+          const b1 = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.5, 0.5), mat);
+          const b2 = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.5, 0.5), mat);
+          b1.position.set(-0.3, 0, 0); b2.position.set(0.3, 0, 0);
+          group.add(b1, b2);
+          break;
+        }
+
+        case 'meatball': {
+          const geo = new THREE.SphereGeometry(0.5, 16, 16);
+          const mat = new THREE.MeshStandardMaterial({ color: item.color || 0x8d6e63, roughness: 0.6 });
+          group.add(new THREE.Mesh(geo, mat));
+          break;
+        }
+
+        case 'bugcode': {
+          const geo = new THREE.BoxGeometry(0.7, 0.7, 0.7);
+          const mat = new THREE.MeshBasicMaterial({ color: 0x22c55e, wireframe: true });
+          group.add(new THREE.Mesh(geo, mat));
+          break;
+        }
+
+        case 'cabbage': {
+          const leafMat = new THREE.MeshStandardMaterial({ color: item.color || 0x4ade80, side: THREE.DoubleSide });
+          for (let i = 0; i < 3; i++) {
+            const leaf = new THREE.Mesh(new THREE.SphereGeometry(0.6, 8, 8, 0, Math.PI, 0, Math.PI / 1.5), leafMat);
+            leaf.rotation.set(Math.random(), Math.random(), Math.random());
+            group.add(leaf);
+          }
+          break;
+        }
+
+        case 'woodear': {
+          const geo = new THREE.CylinderGeometry(0.65, 0.65, 0.08, 12);
+          const mat = new THREE.MeshStandardMaterial({ color: item.color || 0x1c1917, roughness: 0.2 });
+          group.add(new THREE.Mesh(geo, mat));
+          break;
+        }
+
+        case 'enoki': {
+          const mat = new THREE.MeshStandardMaterial({ color: item.color || 0xfef08a });
+          for (let i = 0; i < 6; i++) {
+            const stalk = new THREE.Mesh(new THREE.CylinderGeometry(0.04, 0.04, 0.9, 8), mat);
+            const cap = new THREE.Mesh(new THREE.SphereGeometry(0.09, 8, 8), mat);
+            const ox = (Math.random() - 0.5) * 0.35, oz = (Math.random() - 0.5) * 0.35;
+            stalk.position.set(ox, 0.45, oz); cap.position.set(ox, 0.9, oz);
+            group.add(stalk, cap);
+          }
+          break;
+        }
+
+        case 'catpurr': {
+          const geo = new THREE.SphereGeometry(0.45, 16, 16);
+          const mat = new THREE.MeshStandardMaterial({ color: 0xf472b6, emissive: 0xdb2777, emissiveIntensity: 0.5 });
+          group.add(new THREE.Mesh(geo, mat));
+          break;
+        }
+
+        case 'beancurd': {
+          const geo = new THREE.BoxGeometry(0.9, 0.08, 0.7);
+          const mat = new THREE.MeshStandardMaterial({ color: item.color || 0xfacc15, roughness: 0.5 });
+          group.add(new THREE.Mesh(geo, mat));
+          break;
+        }
+
+        case 'chem_const': {
+          const mat = new THREE.MeshStandardMaterial({ color: 0x38bdf8, metalness: 0.8, roughness: 0.2 });
+          const s1 = new THREE.Mesh(new THREE.SphereGeometry(0.25, 12, 12), mat);
+          const s2 = new THREE.Mesh(new THREE.SphereGeometry(0.25, 12, 12), mat);
+          s1.position.set(-0.35, 0, 0); s2.position.set(0.35, 0, 0);
+          group.add(s1, s2);
+          break;
+        }
+
+        case 'sauce_dollop': {
+          const geo = new THREE.ConeGeometry(0.6, 0.5, 12);
+          const mat = new THREE.MeshStandardMaterial({ color: item.color || 0x78350f, roughness: 0.7 });
+          group.add(new THREE.Mesh(geo, mat));
+          break;
+        }
+
+        case 'chili_oil': {
+          const geo = new THREE.TetrahedronGeometry(0.25);
+          const mat = new THREE.MeshBasicMaterial({ color: 0xef4444 });
+          for (let i = 0; i < 7; i++) {
+            const p = new THREE.Mesh(geo, mat);
+            p.position.set((Math.random() - 0.5) * 0.8, (Math.random() - 0.5) * 0.2, (Math.random() - 0.5) * 0.8);
+            group.add(p);
+          }
+          break;
+        }
+
+        case 'boss_promise': {
+          const geo = new THREE.SphereGeometry(0.6, 16, 16);
+          const mat = new THREE.MeshPhysicalMaterial({ color: 0x94a3b8, transparent: true, opacity: 0.35, transmission: 0.9 });
+          group.add(new THREE.Mesh(geo, mat));
+          break;
+        }
+
+        case 'boba_tea': {
+          const bobaMat = new THREE.MeshStandardMaterial({ color: 0x18181b, roughness: 0.1 });
+          for (let i = 0; i < 5; i++) {
+            const pearl = new THREE.Mesh(new THREE.SphereGeometry(0.18, 12, 12), bobaMat);
+            pearl.position.set((Math.random() - 0.5) * 0.6, (Math.random() - 0.5) * 0.2, (Math.random() - 0.5) * 0.6);
+            group.add(pearl);
+          }
+          break;
+        }
+
+        case 'gold_leaf': {
+          const geo = new THREE.PlaneGeometry(0.3, 0.3);
+          const mat = new THREE.MeshStandardMaterial({ color: 0xffd700, metalness: 0.95, roughness: 0.1, side: THREE.DoubleSide });
+          for (let i = 0; i < 6; i++) {
+            const leaf = new THREE.Mesh(geo, mat);
+            leaf.position.set((Math.random() - 0.5) * 0.8, (Math.random() - 0.5) * 0.2, (Math.random() - 0.5) * 0.8);
+            leaf.rotation.set(Math.random(), Math.random(), Math.random());
+            group.add(leaf);
+          }
+          break;
+        }
+
+        case 'pure_reason': {
+          const geo = new THREE.OctahedronGeometry(0.55);
+          const mat = new THREE.MeshPhysicalMaterial({ color: 0xe0f2fe, roughness: 0.0, transmission: 0.9, transparent: true, opacity: 0.85 });
+          group.add(new THREE.Mesh(geo, mat));
+          break;
+        }
+
+        case 'golden_egg': {
+          const geo = new THREE.SphereGeometry(0.5, 16, 16); geo.scale(1, 1.25, 1);
+          const mat = new THREE.MeshStandardMaterial({ color: 0xfacc15, metalness: 0.3, roughness: 0.1 });
+          const light = new THREE.PointLight(0xfacc15, 1.5, 3);
+          group.add(new THREE.Mesh(geo, mat), light);
+          break;
+        }
+
+        case 'unicorn_tear': {
+          const geo = new THREE.ConeGeometry(0.45, 0.9, 16);
+          const mat = new THREE.MeshStandardMaterial({ color: 0xec4899, emissive: 0xdb2777, metalness: 0.8, roughness: 0.1 });
+          group.add(new THREE.Mesh(geo, mat));
+          break;
+        }
+
+        case 'blackhole': {
+          const geo = new THREE.SphereGeometry(0.5, 24, 24);
+          const mat = new THREE.MeshBasicMaterial({ color: 0x000000 });
+          const ring = new THREE.Mesh(new THREE.TorusGeometry(0.75, 0.08, 12, 24), new THREE.MeshBasicMaterial({ color: 0xa855f7 }));
+          ring.rotation.x = Math.PI / 2;
+          group.add(new THREE.Mesh(geo, mat), ring);
+          break;
+        }
+
+        case 'tesseract': {
+          const outer = new THREE.Mesh(new THREE.BoxGeometry(0.8, 0.8, 0.8), new THREE.MeshBasicMaterial({ color: 0x818cf8, wireframe: true }));
+          const inner = new THREE.Mesh(new THREE.BoxGeometry(0.4, 0.4, 0.4), new THREE.MeshBasicMaterial({ color: 0xc084fc, wireframe: true }));
+          group.add(outer, inner);
+          break;
+        }
+
+        case 'soul_ring': {
+          const geo = new THREE.TorusGeometry(0.55, 0.18, 12, 24);
+          const mat = new THREE.MeshStandardMaterial({ color: 0xb45309, roughness: 0.3, metalness: 0.5 });
+          const mesh = new THREE.Mesh(geo, mat); mesh.rotation.x = Math.PI / 2;
+          group.add(mesh);
+          break;
+        }
+
+        case 'shiba': {
+          const head = new THREE.Mesh(new THREE.SphereGeometry(0.45, 16, 16), new THREE.MeshStandardMaterial({ color: 0xf97316 }));
+          const snout = new THREE.Mesh(new THREE.SphereGeometry(0.2, 12, 12), new THREE.MeshStandardMaterial({ color: 0xffffff }));
+          snout.position.set(0, -0.05, 0.3);
+          group.add(head, snout);
+          break;
+        }
+
+        case 'octopus': {
+          const geo = new THREE.TorusGeometry(0.5, 0.15, 12, 24);
+          const mat = new THREE.MeshStandardMaterial({ color: 0x9333ea, roughness: 0.3 });
+          group.add(new THREE.Mesh(geo, mat));
+          break;
+        }
+
+        case 'dino_rib': {
+          const geo = new THREE.CylinderGeometry(0.15, 0.15, 1.3, 12);
+          const mat = new THREE.MeshStandardMaterial({ color: 0x78350f, roughness: 0.8 });
+          const mesh = new THREE.Mesh(geo, mat); mesh.rotation.z = Math.PI / 3;
+          group.add(mesh);
+          break;
+        }
+
+        default: {
+          const geo = new THREE.SphereGeometry(0.5, 12, 12);
+          const mat = new THREE.MeshStandardMaterial({ color: item.color || 0xff8800, roughness: 0.3 });
+          group.add(new THREE.Mesh(geo, mat));
+        }
+      }
+
+      return group;
+    }
+
+    /* Drop Ingredient Physics Animation */
+    function dropIngredientIntoPot(item) {
+      const mesh = createIngredient3DMesh(item);
+      const randomAngle = Math.random() * Math.PI * 2;
+      const randomRadius = Math.random() * 2.2;
+      const targetX = Math.cos(randomAngle) * randomRadius;
+      const targetZ = Math.sin(randomAngle) * randomRadius;
+
+      mesh.position.set(targetX, 9, targetZ);
+      scene.add(mesh);
+
+      let posY = 9;
+      let velY = 0;
+      const gravity = -0.02;
+
+      function animateDrop() {
+        velY += gravity;
+        posY += velY;
+        mesh.position.y = posY;
+        mesh.rotation.x += 0.05;
+        mesh.rotation.y += 0.03;
+
+        if (posY <= 2.15) {
+          mesh.position.y = 2.15;
+          sound.playSplash();
+          triggerSplashEffect(targetX, targetZ);
+
+          floatingItems.push({
+            mesh: mesh,
+            baseX: targetX,
+            baseZ: targetZ,
+            currentAngle: Math.atan2(targetZ, targetX),
+            currentRadius: Math.sqrt(targetX * targetX + targetZ * targetZ),
+            bobOffset: Math.random() * 100,
+            rotSpeed: (Math.random() - 0.5) * 0.02
+          });
+        } else {
+          requestAnimationFrame(animateDrop);
+        }
+      }
+      animateDrop();
+    }
+
+    function triggerSplashEffect(x, z) {
+      const ringGeo = new THREE.RingGeometry(0.1, 0.2, 24);
+      const ringMat = new THREE.MeshBasicMaterial({ color: 0xffffff, side: THREE.DoubleSide, transparent: true, opacity: 0.85 });
+      const ring = new THREE.Mesh(ringGeo, ringMat);
+      ring.rotation.x = Math.PI / 2;
+      ring.position.set(x, 2.18, z);
+      scene.add(ring);
+
+      let scale = 1, opacity = 0.85;
+      function animateSplash() {
+        scale += 0.22; opacity -= 0.045;
+        ring.scale.set(scale, scale, 1);
+        ringMat.opacity = opacity;
+        if (opacity > 0) requestAnimationFrame(animateSplash);
+        else { scene.remove(ring); ringGeo.dispose(); ringMat.dispose(); }
+      }
+      animateSplash();
+    }
+
+    /* Stir Pot Vortex Animation */
+    let stirVortexPower = 0;
+    function stirHotPot() {
+      sound.playStirSound();
+      showToast("🌀 正在劇烈攪拌量子湯鍋！", "info");
+      stirVortexPower = 1.0;
+    }
+
+    /* =========================================================================
+       5. MAIN THREE.JS ANIMATION LOOP
+       ========================================================================= */
+    let clock = new THREE.Clock();
+
+    function animate() {
+      requestAnimationFrame(animate);
+      const elapsedTime = clock.getElapsedTime();
+
+      // Flickering Stove Flame Light
+      flameLights.forEach(l => {
+        l.intensity = 2.5 + Math.sin(elapsedTime * 15) * 0.8 + Math.cos(elapsedTime * 23) * 0.5;
+      });
+
+      // Liquid Surface Wave Simulation
+      if (liquidMesh) {
+        const pos = liquidMesh.geometry.attributes.position;
+        const stirMult = 1.0 + stirVortexPower * 3.0 + (isRitualActive ? 2.5 : 0.0);
+        for (let i = 0; i < pos.count; i++) {
+          const u = pos.getX(i);
+          const v = pos.getZ(i);
+          const z = Math.sin(u * 2.5 + elapsedTime * 3.5 * stirMult) * Math.cos(v * 2.5 + elapsedTime * 2.5) * 0.08 * stirMult;
+          pos.setY(i, z);
+        }
+        pos.needsUpdate = true;
+      }
+
+      // Steam & Bubbles
+      steamParticles.forEach(p => {
+        p.position.y += 0.02 + stirVortexPower * 0.02 + (isRitualActive ? 0.04 : 0);
+        p.position.x += Math.sin(elapsedTime + p.position.y) * 0.006;
+        p.material.opacity -= 0.0015;
+        if (p.position.y > 6.0 || p.material.opacity <= 0) resetSteamParticle(p);
+      });
+
+      bubbleParticles.forEach(p => {
+        p.position.y += 0.015 + stirVortexPower * 0.03 + (isRitualActive ? 0.05 : 0);
+        if (p.position.y > 2.25) resetBubbleParticle(p);
+      });
+
+      // Floating Items & Vortex Physics
+      floatingItems.forEach(item => {
+        if (stirVortexPower > 0.01 || isRitualActive) {
+          const mult = isRitualActive ? 2.0 : 1.0;
+          item.currentAngle += 0.08 * (stirVortexPower + 0.2) * mult;
+          item.mesh.position.x = Math.cos(item.currentAngle) * item.currentRadius;
+          item.mesh.position.z = Math.sin(item.currentAngle) * item.currentRadius;
+        }
+        item.mesh.position.y = 2.15 + Math.sin(elapsedTime * 2.8 + item.bobOffset) * (0.06 + stirVortexPower * 0.1);
+        item.mesh.rotation.y += item.rotSpeed + stirVortexPower * 0.1;
+      });
+
+      // Decay Stir Power
+      if (stirVortexPower > 0) {
+        stirVortexPower *= 0.96;
+        if (stirVortexPower < 0.005) stirVortexPower = 0;
+      }
+
+      // Auto Orbit Camera in Final Result Scene
+      if (isGameFinished && !isRitualActive) {
+        potGroup.rotation.y += 0.006;
+      }
+
+      controls.update();
+      renderer.render(scene, camera);
+    }
+
+    function onWindowResize() {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    }
+
+    /* =========================================================================
+       6. GAME FLOW & 5-CHOICE UI LOGIC
+       ========================================================================= */
+    function initUI() {
+      renderRoundDots();
+
+      document.getElementById('btn-start-game').addEventListener('click', startGame);
+      document.getElementById('btn-restart').addEventListener('click', restartGame);
+      document.getElementById('btn-audio').addEventListener('click', toggleAudio);
+      document.getElementById('btn-stir').addEventListener('click', stirHotPot);
+      document.getElementById('btn-stir-final').addEventListener('click', stirHotPot);
+      document.getElementById('btn-share-text').addEventListener('click', shareResultsText);
+      document.getElementById('btn-snapshot').addEventListener('click', exportSnapshotCard);
+    }
+
+    function renderRoundDots() {
+      const container = document.getElementById('round-dots');
+      container.innerHTML = '';
+      for (let i = 1; i <= 5; i++) {
+        const dot = document.createElement('div');
+        dot.className = `w-2.5 h-2.5 rounded-full transition-all duration-300 ${
+          i <= gameState.currentRound ? 'bg-amber-400 shadow-md shadow-amber-400/50 scale-110' : 'bg-slate-700'
+        }`;
+        container.appendChild(dot);
+      }
+    }
+
+    function toggleAudio() {
+      sound.init();
+      const isMuted = sound.toggleMute();
+      const icon = document.getElementById('icon-audio');
+      icon.className = `fa-solid ${isMuted ? 'fa-volume-xmark text-slate-500' : 'fa-volume-high text-amber-400'} text-sm`;
+    }
+
+    function startGame() {
+      sound.init();
+      sound.playSelect();
+
+      document.getElementById('modal-start').classList.add('hidden');
+      document.getElementById('gameplay-area').classList.remove('hidden');
+
+      gameState.currentRound = 1;
+      gameState.usedIds.clear();
+      renderRoundDots();
+      loadRoundUI(1);
+    }
+
+    // Pick 5 Random Unselected Candidates for the Round
+    function getRandom5CandidatesForRound(roundNum) {
+      let categoryName = 'broth';
+      if (roundNum === 2) categoryName = 'meat';
+      else if (roundNum === 3) categoryName = 'veg';
+      else if (roundNum === 4) categoryName = 'sauce';
+      else if (roundNum === 5) categoryName = 'artifact';
+
+      const pool = MASTER_INGREDIENTS.filter(x => x.category === categoryName);
+      const available = pool.filter(x => !gameState.usedIds.has(x.id));
+      const shuffled = [...available].sort(() => 0.5 - Math.random());
+      return shuffled.slice(0, 5); // 5-pick-1 mechanism!
+    }
+
+    function loadRoundUI(roundNum) {
+      const candidates = getRandom5CandidatesForRound(roundNum);
+      const titles = [
+        "第 1 回合：湯底奠基",
+        "第 2 回合：核心蛋白質/主料",
+        "第 3 回合：有機蔬果/植萃物質",
+        "第 4 回合：神聖醬料調味",
+        "第 5 回合：宇宙靈魂聖物"
+      ];
+      const prompts = [
+        "請從 5 種量子高湯中選擇注入鍋中的靈魂...",
+        "請從 5 種核心主料中選擇投入鍋中的蛋白質...",
+        "請選擇吸收湯底精華的有機植萃...",
+        "請選擇賦予鍋物靈魂的特調醬汁...",
+        "選擇最後的神聖聖物，開啟量子火鍋煉金大典！"
+      ];
+
+      document.getElementById('round-title-badge').textContent = titles[roundNum - 1];
+      document.getElementById('round-prompt').textContent = prompts[roundNum - 1];
+
+      const choicesContainer = document.getElementById('choices-container');
+      choicesContainer.innerHTML = '';
+
+      candidates.forEach((opt) => {
+        const card = document.createElement('div');
+        card.className = 'glass-card p-3 rounded-2xl cursor-pointer flex flex-col justify-between space-y-2 pointer-events-auto border border-slate-700/60 hover:border-amber-400/80';
+        card.innerHTML = `
+          <div>
+            <div class="flex items-center space-x-2 mb-1.5">
+              <div class="w-8 h-8 rounded-xl bg-slate-800 border border-slate-700 flex items-center justify-center text-amber-400 shadow shrink-0">
+                <i class="fa-solid ${opt.icon} text-sm"></i>
+              </div>
+              <h4 class="text-xs md:text-sm font-bold text-white group-hover:text-amber-300 truncate">${opt.name}</h4>
+            </div>
+            <p class="text-[11px] text-slate-300 leading-snug line-clamp-2">${opt.desc}</p>
+          </div>
+
+          <div class="pt-1.5 border-t border-slate-700/50 flex items-center justify-between text-[10px] font-mono text-slate-400">
+            <span>旨味:${opt.stats.umami}</span>
+            <span class="text-amber-400 font-bold">選擇放入 →</span>
+          </div>
+        `;
+
+        card.addEventListener('click', () => selectIngredient(opt));
+        choicesContainer.appendChild(card);
+      });
+    }
+
+    function selectIngredient(item) {
+      sound.playSelect();
+
+      gameState.chosenItems.push(item);
+      gameState.usedIds.add(item.id);
+
+      gameState.stats.umami += item.stats.umami;
+      gameState.stats.abs += item.stats.abs;
+      gameState.stats.soul += item.stats.soul;
+      gameState.stats.heat += item.stats.heat;
+      gameState.stats.chaos += item.stats.chaos;
+
+      if (item.category === 'broth') {
+        currentBrothColor = item.color;
+        liquidMaterial.color.setHex(item.color);
+        if (item.fogColor) scene.fog.color.setHex(item.fogColor);
+      } else {
+        dropIngredientIntoPot(item);
+      }
+
+      updatePotContentsUI();
+
+      if (gameState.currentRound < 5) {
+        gameState.currentRound++;
+        renderRoundDots();
+        loadRoundUI(gameState.currentRound);
+      } else {
+        // Round 5 complete! Start Sacred Ritual Ceremony!
+        startSacredBoilingCeremony();
+      }
+    }
+
+    function updatePotContentsUI() {
+      const list = document.getElementById('pot-contents-list');
+      document.getElementById('item-count').textContent = gameState.chosenItems.length;
+
+      list.innerHTML = '';
+      gameState.chosenItems.forEach((item) => {
+        const row = document.createElement('div');
+        row.className = 'flex items-center justify-between bg-slate-800/60 px-2.5 py-1.5 rounded-xl text-xs text-slate-200 border border-slate-700/50';
+        row.innerHTML = `
+          <div class="flex items-center space-x-2 truncate">
+            <i class="fa-solid ${item.icon} text-amber-400 text-xs"></i>
+            <span class="truncate font-medium">${item.name}</span>
+          </div>
+        `;
+        list.appendChild(row);
+      });
+    }
+
+    /* =========================================================================
+       7. 10-SECOND SACRED RITUAL CEREMONY
+       ========================================================================= */
+    function startSacredBoilingCeremony() {
+      isRitualActive = true;
+      sound.playRitualDrone();
+
+      document.getElementById('gameplay-area').classList.add('hidden');
+      document.getElementById('drawer-pot').classList.add('hidden');
+      document.getElementById('round-indicator').classList.add('hidden');
+
+      const ritualOverlay = document.getElementById('ritual-overlay');
+      ritualOverlay.classList.remove('hidden');
+
+      const phaseSubtitle = document.getElementById('ritual-phase-subtitle');
+      const phaseTitle = document.getElementById('ritual-phase-title');
+      const phaseDesc = document.getElementById('ritual-phase-desc');
+      const progressBar = document.getElementById('ritual-progress-bar');
+
+      // Camera Animation Target
+      controls.autoRotate = false;
+      let startTime = performance.now();
+      const totalDuration = 9500; // 9.5 seconds ceremony
+
+      // Phase choreography timeline
+      function ritualStep(now) {
+        const elapsed = now - startTime;
+        const progress = Math.min(1.0, elapsed / totalDuration);
+        progressBar.style.width = `${progress * 100}%`;
+
+        if (elapsed < 2500) {
+          // PHASE 1: Seal Broth Dome
+          phaseSubtitle.textContent = "STAGE 01 / 04";
+          phaseTitle.textContent = "第一階段：封印靈魂湯底";
+          phaseDesc.textContent = "金色神聖結界罩降臨，準備凝聚宇宙級美味波函數...";
+
+          // Lower Magic Lid Dome
+          const domeY = THREE.MathUtils.lerp(15, 2.3, elapsed / 2500);
+          lidDomeMesh.position.y = domeY;
+          lidDomeMesh.material.opacity = THREE.MathUtils.lerp(0.0, 0.7, elapsed / 2500);
+
+          // Camera orbit high angle
+          camera.position.x = Math.sin(elapsed * 0.001) * 12;
+          camera.position.z = Math.cos(elapsed * 0.001) * 12;
+          camera.position.y = 8;
+
+        } else if (elapsed < 5000) {
+          // PHASE 2: Rainbow Quantum Soup Reaction
+          phaseSubtitle.textContent = "STAGE 02 / 04";
+          phaseTitle.textContent = "第二階段：凝結宇宙混沌";
+          phaseDesc.textContent = "湯底產生強烈化學彩虹突變，熱能突破極限沸點！";
+
+          lidDomeMesh.position.y = 2.3;
+          lidDomeMesh.material.opacity = 0.7;
+
+          // Wild HSL Liquid Color Shift
+          const hue = ((elapsed - 2500) / 2500 * 360) % 360;
+          liquidMaterial.color.setHSL(hue / 360, 0.9, 0.5);
+
+          // Top Down Camera
+          camera.position.set(0, 14, 0.1);
+
+        } else if (elapsed < 7500) {
+          // PHASE 3: Vertical Light Beam & Crescendo
+          phaseSubtitle.textContent = "STAGE 03 / 04";
+          phaseTitle.textContent = "第三階段：火候極限淬煉";
+          phaseDesc.textContent = "九天通天光柱噴發，極致旨味量子點即將誕生！";
+
+          // Light Beam Explosion
+          lightBeamMesh.material.opacity = THREE.MathUtils.lerp(0.0, 0.85, (elapsed - 5000) / 2500);
+          lightBeamMesh.rotation.y += 0.05;
+
+          // Close up Camera Orbit
+          camera.position.x = Math.sin(elapsed * 0.003) * 8;
+          camera.position.z = Math.cos(elapsed * 0.003) * 8;
+          camera.position.y = 4.5;
+
+        } else if (elapsed < totalDuration) {
+          // PHASE 4: Divine Blessing
+          phaseSubtitle.textContent = "FINAL STAGE";
+          phaseTitle.textContent = "最後階段：抽象神明賜福！";
+          phaseDesc.textContent = "神明降臨注入終極靈魂，神聖大功告成！";
+
+          lightBeamMesh.material.opacity = 0.85;
+
+        } else {
+          // CEREMONY COMPLETE!
+          sound.playDivineGong();
+
+          // Flash White Screen
+          const flash = document.getElementById('flash-overlay');
+          flash.style.opacity = '1.0';
+
+          setTimeout(() => {
+            // Reset Ceremony Visual FX
+            lidDomeMesh.material.opacity = 0;
+            lidDomeMesh.position.y = 15;
+            lightBeamMesh.material.opacity = 0;
+            liquidMaterial.color.setHex(currentBrothColor);
+
+            ritualOverlay.classList.add('hidden');
+            flash.style.opacity = '0';
+            isRitualActive = false;
+
+            // Show Final Results Modal
+            finishCookingRitual();
+          }, 600);
+
+          return;
+        }
+
+        requestAnimationFrame(ritualStep);
+      }
+
+      requestAnimationFrame(ritualStep);
+    }
+
+    /* =========================================================================
+       8. EVALUATION & RESULT SYSTEM
+       ========================================================================= */
+    function finishCookingRitual() {
+      isGameFinished = true;
+
+      const count = gameState.chosenItems.length;
+      const umami = Math.min(100, Math.round(gameState.stats.umami / count));
+      const abs = Math.min(100, Math.round(gameState.stats.abs / count));
+      const soul = Math.min(100, Math.round(gameState.stats.soul / count));
+      const heat = Math.min(100, Math.round(gameState.stats.heat / count));
+      const chaos = Math.min(100, Math.round(gameState.stats.chaos / count));
+
+      const overall = Math.round((umami * 0.25) + (abs * 0.3) + (soul * 0.25) + (chaos * 0.1) + (heat * 0.1));
+
+      // Determine Tier Rating Badge
+      let tier = "B";
+      let tierClass = "tier-b";
+      if (overall >= 95 || (abs >= 96 && soul >= 96)) {
+        tier = "SSS+"; tierClass = "tier-sss-plus";
+      } else if (overall >= 88) {
+        tier = "SSS"; tierClass = "tier-sss";
+      } else if (overall >= 80) {
+        tier = "SS"; tierClass = "tier-ss";
+      } else if (overall >= 72) {
+        tier = "S"; tierClass = "tier-s";
+      } else if (overall >= 62) {
+        tier = "A"; tierClass = "tier-a";
+      } else if (overall >= 48) {
+        tier = "B"; tierClass = "tier-b";
+      } else if (overall >= 32) {
+        tier = "C"; tierClass = "tier-c";
+      } else {
+        tier = "F"; tierClass = "tier-f";
+      }
+
+      const badgeEl = document.getElementById('tier-badge');
+      badgeEl.textContent = tier;
+      badgeEl.className = `text-4xl md:text-5xl font-black font-mono tracking-tighter ${tierClass}`;
+
+      const evaluation = generateSurrealReview(tier, umami, abs, soul, heat, chaos);
+
+      document.getElementById('result-title').textContent = evaluation.title;
+      document.getElementById('result-subtitle').textContent = evaluation.subtitle;
+      document.getElementById('result-review').textContent = evaluation.review;
+
+      document.getElementById('score-umami-val').textContent = umami;
+      document.getElementById('score-abs-val').textContent = abs;
+      document.getElementById('score-soul-val').textContent = soul;
+      document.getElementById('score-heat-val').textContent = heat;
+      document.getElementById('score-chaos-val').textContent = chaos;
+
+      const modal = document.getElementById('modal-result');
+      modal.classList.remove('hidden');
+
+      setTimeout(() => {
+        document.getElementById('score-umami-bar').style.width = `${umami}%`;
+        document.getElementById('score-abs-bar').style.width = `${abs}%`;
+        document.getElementById('score-soul-bar').style.width = `${soul}%`;
+        document.getElementById('score-heat-bar').style.width = `${heat}%`;
+        document.getElementById('score-chaos-bar').style.width = `${chaos}%`;
+      }, 100);
+    }
+
+    function generateSurrealReview(tier, umami, abs, soul, heat, chaos) {
+      const broth = gameState.chosenItems[0]?.name || "神秘高湯";
+      const finalItem = gameState.chosenItems[4]?.name || "終極聖物";
+
+      let title = "";
+      let subtitle = "";
+
+      if (tier === "SSS+") {
+        title = `【創世神級·十一維奇點火鍋】`;
+        subtitle = `—— 喝一口能直視宇宙起源，但舌頭會進入疊加態。`;
+      } else if (tier === "SSS") {
+        title = `【不可名狀之古老美味火鍋】`;
+        subtitle = `—— 湯底散發出克蘇魯文明的低語與無窮鮮旨味。`;
+      } else if (tier === "SS") {
+        title = `【米其林三萬星·極致饗宴鍋】`;
+        subtitle = `—— 宇宙美食評論家當場跪地痛哭流涕的廚藝巔峰。`;
+      } else if (tier === "S") {
+        title = `【人間頂級·靈魂救贖暖心火鍋】`;
+        subtitle = `—— 喝完連隔壁村的流浪貓都流下感動的眼淚。`;
+      } else if (tier === "A") {
+        title = `【街角溫馨·樸實無華火鍋】`;
+        subtitle = `—— 雖然沒有超越物理法則，但依然能填飽肚子。`;
+      } else if (tier === "B") {
+        title = `【化學實驗室產物·突變火鍋】`;
+        subtitle = `—— 湯汁呈現不明發光沉澱物，建議配戴防毒面具。`;
+      } else if (tier === "C") {
+        title = `【混亂混沌·失控黑暗火鍋】`;
+        subtitle = `—— 連廚餘回收機器人都拒絕接收的神秘物質。`;
+      } else {
+        title = `【次元崩壞·地獄毀滅火鍋】`;
+        subtitle = `—— 戈登拉姆齊搭乘直升機跨國前來告你違犯宇宙法。`;
+      }
+
+      const review = `以『${broth}』奠定基礎，融合『${gameState.chosenItems[1]?.name}』與『${gameState.chosenItems[2]?.name}』。調和『${gameState.chosenItems[3]?.name}』，最終投入『${finalItem}』完成神聖儀式！旨味高達 ${umami}，抽象指數 ${abs}。整鍋湯散發出前所未見的神聖能量場！`;
+
+      return { title, subtitle, review };
+    }
+
+    /* =========================================================================
+       9. FIXED HIGH-RES 2D SNAPSHOT CARD EXPORTER (PNG) & COPY SHARE
+       ========================================================================= */
+    function shareResultsText() {
+      const tier = document.getElementById('tier-badge').textContent;
+      const title = document.getElementById('result-title').textContent;
+      const itemsList = gameState.chosenItems.map(x => x.name).join(' + ');
+
+      const text = `🍲【抽象神聖火鍋大師：終極煮鍋儀式版】戰績報告！\n🏆 我的煉金評級：[ ${tier} ]\n✨ 鍋物名號：${title}\n🥘 聖物成分：${itemsList}\n\n快來挑戰 100+ 食材煉製屬於你的量子火鍋！`;
+
+      if (navigator.share) {
+        navigator.share({ title: '抽象神聖火鍋戰績', text: text, url: window.location.href })
+          .catch(() => copyToClipboard(text));
+      } else {
+        copyToClipboard(text);
+      }
+    }
+
+    function copyToClipboard(text) {
+      const el = document.createElement('textarea');
+      el.value = text;
+      document.body.appendChild(el);
+      el.select();
+      document.execCommand('copy');
+      document.body.removeChild(el);
+      showToast("📋 戰績已複製至剪貼簿！可直接貼上至 IG/LINE！", "success");
+    }
+
+    // High Quality 2D Snapshot Card Generator
+    function exportSnapshotCard() {
+      showToast("📸 正在擷取 3D 畫面生成戰績卡片...", "info");
+
+      // Force Immediate Three.js Render Call
+      renderer.render(scene, camera);
+      const webglDataUrl = renderer.domElement.toDataURL('image/png');
+
+      // Create High-Res Offscreen 2D Canvas
+      const snapshotCanvas = document.createElement('canvas');
+      snapshotCanvas.width = 900;
+      snapshotCanvas.height = 1200;
+      const ctx = snapshotCanvas.getContext('2d');
+
+      // 1. Dark Gradient Background
+      const bgGrad = ctx.createLinearGradient(0, 0, 0, 1200);
+      bgGrad.addColorStop(0, '#0f172a');
+      bgGrad.addColorStop(0.5, '#030712');
+      bgGrad.addColorStop(1, '#1e1b4b');
+      ctx.fillStyle = bgGrad;
+      ctx.fillRect(0, 0, 900, 1200);
+
+      // 2. Gold Border & Runic Trims
+      ctx.strokeStyle = '#d97706';
+      ctx.lineWidth = 12;
+      ctx.strokeRect(20, 20, 860, 1160);
+
+      ctx.strokeStyle = '#facc15';
+      ctx.lineWidth = 3;
+      ctx.strokeRect(32, 32, 836, 1136);
+
+      // Load 3D Scene Image into Framed Viewport
+      const webglImg = new Image();
+      webglImg.src = webglDataUrl;
+      webglImg.onload = () => {
+        // Draw 3D Viewport Window
+        ctx.fillStyle = '#000000';
+        ctx.fillRect(50, 200, 800, 520);
+        ctx.drawImage(webglImg, 50, 200, 800, 520);
+
+        ctx.strokeStyle = '#fbbf24';
+        ctx.lineWidth = 4;
+        ctx.strokeRect(50, 200, 800, 520);
+
+        // Header Title
+        ctx.fillStyle = '#fde047';
+        ctx.font = 'bold 42px "Noto Serif TC", serif';
+        ctx.fillText('抽象神聖火鍋大師', 50, 85);
+
+        ctx.fillStyle = '#fb923c';
+        ctx.font = '20px monospace';
+        ctx.fillText('RITUAL EDITION • QUANTUM ALCHEMY', 50, 125);
+
+        // Tier Rating Badge
+        const tier = document.getElementById('tier-badge').textContent;
+        ctx.fillStyle = '#f43f5e';
+        ctx.font = '900 72px monospace';
+        ctx.textAlign = 'right';
+        ctx.fillText(`[ ${tier} ]`, 850, 110);
+        ctx.textAlign = 'left';
+
+        // Dish Title
+        const title = document.getElementById('result-title').textContent;
+        ctx.fillStyle = '#ffffff';
+        ctx.font = 'bold 32px "Noto Serif TC", serif';
+        ctx.fillText(title, 50, 770);
+
+        // Subtitle
+        const subtitle = document.getElementById('result-subtitle').textContent;
+        ctx.fillStyle = '#fbbf24';
+        ctx.font = '18px "Noto Sans TC", sans-serif';
+        ctx.fillText(subtitle, 50, 810);
+
+        // Ingredients List Box
+        ctx.fillStyle = 'rgba(15, 23, 42, 0.85)';
+        ctx.fillRect(50, 840, 800, 220);
+        ctx.strokeStyle = '#334155';
+        ctx.lineWidth = 2;
+        ctx.strokeRect(50, 840, 800, 220);
+
+        ctx.fillStyle = '#38bdf8';
+        ctx.font = 'bold 20px "Noto Sans TC", sans-serif';
+        ctx.fillText('🍲 五大煉金成分：', 70, 880);
+
+        gameState.chosenItems.forEach((item, idx) => {
+          ctx.fillStyle = '#e2e8f0';
+          ctx.font = '18px "Noto Sans TC", sans-serif';
+          const yPos = 920 + (idx * 26);
+          ctx.fillText(`【第${idx+1}回合】${item.name}`, 80, yPos);
+        });
+
+        // Watermark Footer
+        ctx.fillStyle = '#64748b';
+        ctx.font = '16px monospace';
+        ctx.fillText('Generated by Surreal 3D Hot Pot Master Engine', 50, 1120);
+
+        // Trigger PNG Download
+        const link = document.createElement('a');
+        link.download = `HotPot_Master_${tier}_Achievement.png`;
+        link.href = snapshotCanvas.toDataURL('image/png');
+        link.click();
+
+        showToast("📸 3D 戰績卡圖片已下載！", "success");
+      };
+    }
+
+    function showToast(msg, type = "info") {
+      const container = document.getElementById('toast-container');
+      const toast = document.createElement('div');
+      toast.className = `glass-panel px-4 py-2.5 rounded-2xl text-xs font-bold text-white shadow-2xl flex items-center space-x-2 border border-amber-500/40 animate-bounce mb-2`;
+      toast.innerHTML = `<span>${msg}</span>`;
+      container.appendChild(toast);
+      setTimeout(() => {
+        toast.remove();
+      }, 3500);
+    }
+
+    function restartGame() {
+      sound.playSelect();
+
+      gameState.currentRound = 0;
+      gameState.chosenItems = [];
+      gameState.usedIds.clear();
+      gameState.stats = { umami: 0, abs: 0, soul: 0, heat: 0, chaos: 0 };
+      isGameFinished = false;
+      isRitualActive = false;
+
+      floatingItems.forEach((item) => scene.remove(item.mesh));
+      floatingItems = [];
+
+      document.getElementById('modal-result').classList.add('hidden');
+      document.getElementById('modal-start').classList.remove('hidden');
+      document.getElementById('drawer-pot').classList.remove('hidden');
+      document.getElementById('round-indicator').classList.remove('hidden');
+
+      currentBrothColor = 0xcc1100;
+      liquidMaterial.color.setHex(currentBrothColor);
+      scene.fog.color.setHex(0x030712);
+
+      updatePotContentsUI();
+      renderRoundDots();
+    }
+
+    window.addEventListener('load', () => {
+      init3DScene();
+      initUI();
+      animate();
+    });
+  </script>
+</body>
+</html>
